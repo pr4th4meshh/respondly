@@ -1,7 +1,10 @@
+"use client"
+import { useSession } from "next-auth/react"
 import Link from "next/link"
 import React from "react"
 
 const Navbar = () => {
+  const  {data: session} = useSession()
   return (
     <>
       <header className="bg-white dark:bg-gray-900">
@@ -72,21 +75,30 @@ const Navbar = () => {
             </nav>
 
             <div className="flex items-center gap-4">
-              <div className="sm:flex sm:gap-4">
-                <a
-                  className="block rounded-md bg-blue-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-blue-400 dark:hover:bg-blue-500"
-                  href="#"
-                >
-                  Login
-                </a>
 
-                <a
-                  className="hidden rounded-md bg-gray-100 px-5 py-2.5 text-sm font-medium text-teal-600 transition hover:text-blue-600/75 sm:block dark:bg-gray-800 dark:text-white dark:hover:text-white/75"
-                  href="#about"
-                >
-                  Register
-                </a>
-              </div>
+            {
+              session && session.user?.name ? (
+                <>
+                <h1 className="text-gray-500 transition hover:text-gray-500/75 dark:text-white dark:hover:text-white/75">Hello, {session.user?.name}</h1>
+                </>
+              ) :
+
+              <div className="sm:flex sm:gap-4">
+              <Link
+                className="block rounded-md bg-blue-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-blue-400 dark:hover:bg-blue-500"
+                href="/login"
+              >
+                Login
+              </Link>
+
+              <Link
+                className="hidden rounded-md bg-gray-100 px-5 py-2.5 text-sm font-medium text-teal-600 transition hover:text-blue-600/75 sm:block dark:bg-gray-800 dark:text-white dark:hover:text-white/75"
+                href="/register"
+              >
+                Register
+              </Link>
+            </div>
+            }
 
               <button className="block rounded bg-gray-100 p-2.5 text-gray-600 transition hover:text-gray-600/75 md:hidden dark:bg-gray-800 dark:text-white dark:hover:text-white/75">
                 <span className="sr-only">Toggle menu</span>
