@@ -1,7 +1,7 @@
 "use client"
 import { useState, useEffect } from "react"
 
-const FormPage = ({ params }) => {
+const FormPage = ({ params }: { params: { formId: string } }) => {
   const [form, setForm] = useState(null)
   const [responses, setResponses] = useState({})
   const [successMessage, setSuccessMessage] = useState("")
@@ -62,7 +62,7 @@ const FormPage = ({ params }) => {
 
   return (
     <div className="h-screen bg-gray-900">
-      <div className="container mx-auto py-16">
+      <div className="container mx-auto py-16 px-2 sm:px-0">
         <div className="mx-auto max-w-lg border border-gray-800 p-8 rounded-lg">
           <h1 className="text-blue-300 text-3xl text-center">{form.title}</h1>
           <form
@@ -71,7 +71,7 @@ const FormPage = ({ params }) => {
           >
             {form.fields.map((field, index) => (
               <div key={index}>
-                <label>{field.label}</label>
+                <label>{field.label}<span className="text-red-500 ml-0.5">*</span></label>
                 <input
                   type={field.type}
                   value={responses[index] || ""}
@@ -89,7 +89,7 @@ const FormPage = ({ params }) => {
               Submit Response
             </button>
           </form>
-          {successMessage && <p>{successMessage}</p>}
+          {successMessage && <p className="text-lg text-center text-green-300">{successMessage}</p>}
         </div>
       </div>
     </div>

@@ -24,7 +24,7 @@ const CreateForm = ({ onSubmit }) => {
   return (
     <>
       {/* <div className="mx-auto max-w-screen-xl px-4 py-16 sm:px-6 lg:px-8"> */}
-      <div className="mx-auto max-w-lg border border-gray-800 mt-12 p-8 rounded-lg">
+      <div className="mx-auto max-w-lg border border-gray-800 mt-12 p-2 sm:p-8 rounded-lg">
         <h1 className="text-center text-3xl font-bold text-blue-300 sm:text-3xl">
           Create Form
         </h1>
@@ -36,7 +36,7 @@ const CreateForm = ({ onSubmit }) => {
 
         <form
           onSubmit={handleSubmit}
-          className="mb-0 mt-6 space-y-4 rounded-lg p-4 sm:p-6 lg:p-8 text-gray-300"
+          className="mb-0 mt-6 space-y-4 rounded-lg p-1 sm:p-6 lg:p-8 text-gray-300"
         >
           <div>
             <label htmlFor="email" className="sr-only">

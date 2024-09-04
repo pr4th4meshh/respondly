@@ -117,7 +117,7 @@ const ProfilePage = () => {
                   >
                     <Link href={`/form/${form._id}`}>
                       <h3 className="text-lg text-blue-300">
-                        {form.title} | {form._id}
+                        {form.title}
                       </h3>
                     </Link>
                     <button

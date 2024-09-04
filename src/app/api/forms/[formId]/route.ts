@@ -1,4 +1,3 @@
-// src/app/api/forms/[formId]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import connectToDatabase from "@/lib/db";
 import Form from "@/models/Form";
