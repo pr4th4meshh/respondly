@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 
-const CreateForm = ({ onSubmit }) => {
+const CreateForm = ({ onSubmit, onSuccess }) => {
   const [title, setTitle] = useState("")
   const [fields, setFields] = useState([{ label: "", type: "text" }])
 
@@ -24,13 +24,13 @@ const CreateForm = ({ onSubmit }) => {
   return (
     <>
       {/* <div className="mx-auto max-w-screen-xl px-4 py-16 sm:px-6 lg:px-8"> */}
-      <div className="mx-auto max-w-lg border border-gray-800 mt-12 p-2 sm:p-8 rounded-lg">
+      <div className="mx-auto max-w-screen-xl border border-gray-800 p-2 sm:p-6 rounded-lg">
         <h1 className="text-center text-3xl font-bold text-blue-300 sm:text-3xl">
           Create Form
         </h1>
 
         <p className="mx-auto mt-4 max-w-md text-center text-gray-500">
-          Start by creating your first Respondly form by filling the above
+          Start by creating a Respondly form by filling the above
           fields according to your needs
         </p>
 
@@ -95,6 +95,11 @@ const CreateForm = ({ onSubmit }) => {
             Create Form
           </button>
         </form>
+        {onSuccess && (
+        <div className="mb-4 p-3 text-xl text-green-500 text-center">
+          {onSuccess}
+        </div>
+      )}
       </div>
     </>
   )
