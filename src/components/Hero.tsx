@@ -21,7 +21,7 @@ const Hero = () => {
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Link
               className="block w-full rounded bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 px-12 py-3 text-sm font-medium text-white focus:outline-none focus:ring active:text-opacity-75 sm:w-auto"
-              href="/login"
+              href="/profile"
             >
               Get Started
             </Link>
