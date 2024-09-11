@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation"
 import ButtonComponent from "@/components/ButtonComponent"
 import ConfirmModal from "@/components/ConfirmModal"
 import { IoAddCircleOutline } from "react-icons/io5"
+import EditFormModal from "@/components/EditFormModal"
 
 interface IForm {
   _id: string
@@ -24,25 +25,34 @@ const ProfilePage = () => {
   const [forms, setForms] = useState<IForm[]>([])
   const [loading, setLoading] = useState(false)
   const [showPopup, setShowPopup] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
   const [selectedForm, setSelectedForm] = useState<IForm | null>(null)
   const { data: session, update } = useSession()
 
-  if (!session?.user) {
-    return (
-      <div className="h-hero-height bg-gray-900 flex justify-center items-center flex-col">
-        <h1 className="text-3xl text-blue-300 mb-2">
-          You need to login to view your profile!
-        </h1>
-        <Link href="/login">
-          <ButtonComponent
-            buttonBg="bg-blue-300"
-            buttonTitle="Login to continue"
-          />
-        </Link>
-      </div>
-    )
+  // fetching forms from the API
+  const fetchForms = async () => {
+    setLoading(true)
+    try {
+      const response = await fetch("/api/forms")
+      const data = await response.json()
+      if (response.ok) {
+        setForms(data.data)
+      } else {
+        console.error("Failed to fetch forms:", data.error)
+      }
+    } catch (error) {
+      console.error("Error fetching forms:", error)
+    } finally {
+      setLoading(false)
+    }
   }
 
+  // Fetch forms on component mount
+  useEffect(() => {
+    fetchForms()
+  }, [])
+
+  
   // Edit user info handler
   const handleEditUser = async (updatedUserData: IUpdatedUserData) => {
     try {
@@ -90,29 +100,6 @@ const ProfilePage = () => {
     }
   }
 
-  // fetching forms from the API
-  const fetchForms = async () => {
-    setLoading(true)
-    try {
-      const response = await fetch("/api/forms")
-      const data = await response.json()
-      if (response.ok) {
-        setForms(data.data)
-      } else {
-        console.error("Failed to fetch forms:", data.error)
-      }
-    } catch (error) {
-      console.error("Error fetching forms:", error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  // Fetch forms on component mount
-  useEffect(() => {
-    fetchForms()
-  }, [])
-
   // Handle showing delete confirmation popup
   const handleShowDeletePopup = (form: IForm) => {
     setSelectedForm(form)
@@ -140,6 +127,32 @@ const ProfilePage = () => {
         console.error("Failed to delete form:", error)
       }
     }
+  }
+
+  const handleShowEditFormModal = (form) => {
+    setShowEditModal(true)
+    setSelectedForm(form)
+  }
+
+  const handleCancelEditFormModal = () => {
+    setShowEditModal(false)
+    setSelectedForm(null)
+  }
+
+  if (!session?.user) {
+    return (
+      <div className="h-hero-height bg-gray-900 flex justify-center items-center flex-col">
+        <h1 className="text-3xl text-blue-300 mb-2">
+          You need to login to view your profile!
+        </h1>
+        <Link href="/login">
+          <ButtonComponent
+            buttonBg="bg-blue-300"
+            buttonTitle="Login to continue"
+          />
+        </Link>
+      </div>
+    )
   }
 
   return (
@@ -182,12 +195,19 @@ const ProfilePage = () => {
                     <Link href={`/form/${form._id}`}>
                       <h3 className="text-lg text-blue-300">{form.title}</h3>
                     </Link>
-                    <button
-                      className="bg-red-500 text-white px-4 py-2 rounded"
+                   <div className="flex">
+                   <ButtonComponent
+                      buttonBg="bg-blue-600"
+                      buttonTitle="Edit"
+                      className="mr-2"
+                      onClick={() => handleShowEditFormModal(form)}
+                    />                    
+                    <ButtonComponent
+                      buttonBg="bg-red-500"
+                      buttonTitle="Delete"
                       onClick={() => handleShowDeletePopup(form)}
-                    >
-                      Delete
-                    </button>
+                    />
+                   </div>
                   </li>
                 ))}
               </ul>
@@ -209,6 +229,12 @@ const ProfilePage = () => {
             onCancel={handleCancelDelete}
           />
         )}
+
+        {
+          showEditModal && selectedForm && (
+            <EditFormModal form={selectedForm} title={""} actionName={"Confirm"} onConfirm={""} onCancel={handleCancelEditFormModal} />
+          )
+        }
       </main>
     </div>
   )
