@@ -2,18 +2,20 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import axios from "axios"
-import ProfileForm from "./_components/ProfileForm"
 import { useSession } from "next-auth/react"
-import { useRouter } from "next/navigation"
 import ButtonComponent from "@/components/ButtonComponent"
 import ConfirmModal from "@/components/ConfirmModal"
 import { IoAddCircleOutline } from "react-icons/io5"
 import EditFormModal from "@/components/EditFormModal"
+import ProfileForm from "./_components/ProfileForm"
+import Popup from "@/components/Popup"
 
 interface IForm {
   _id: string
   title: string
+  fields: { label: string }[]
 }
+
 interface IUpdatedUserData {
   username: string
   email: string
@@ -29,7 +31,16 @@ const ProfilePage = () => {
   const [selectedForm, setSelectedForm] = useState<IForm | null>(null)
   const { data: session, update } = useSession()
 
-  // fetching forms from the API
+  // Toast Message States
+  const [messagePopupType, setMessagePopupType] = useState<"success" | "error" | "warning">("success")
+  const [popupMessage, setPopupMessage] = useState("")
+  const [showMessagePopup, setShowMessagePopup] = useState(false)
+
+  const closePopup = () => {
+    setShowMessagePopup(false)
+  }
+
+  // Fetching forms from the API
   const fetchForms = async () => {
     setLoading(true)
     try {
@@ -52,7 +63,6 @@ const ProfilePage = () => {
     fetchForms()
   }, [])
 
-  
   // Edit user info handler
   const handleEditUser = async (updatedUserData: IUpdatedUserData) => {
     try {
@@ -88,25 +98,29 @@ const ProfilePage = () => {
 
       if (response.ok) {
         const result = await response.json()
-        alert("Profile updated successfully!")
-        console.log(result)
+        setShowMessagePopup(true)
+        setPopupMessage("User updated successfully!")
+        setMessagePopupType("success")
         await update()
       } else {
         const errorData = await response.json()
         console.error("Failed to update user:", errorData.message)
       }
     } catch (error) {
+      setShowMessagePopup(true)
+      setPopupMessage("Error while updating user, try again!")
+      setMessagePopupType("error")
       console.error("Error updating user:", error)
     }
   }
 
-  // Handle showing delete confirmation popup
+  // Show delete confirmation popup
   const handleShowDeletePopup = (form: IForm) => {
     setSelectedForm(form)
     setShowPopup(true)
   }
 
-  // Hide delete confirmation popup without deleting
+  // Hide delete confirmation popup
   const handleCancelDelete = () => {
     setSelectedForm(null)
     setShowPopup(false)
@@ -129,7 +143,7 @@ const ProfilePage = () => {
     }
   }
 
-  const handleShowEditFormModal = (form) => {
+  const handleShowEditFormModal = (form: IForm) => {
     setShowEditModal(true)
     setSelectedForm(form)
   }
@@ -137,6 +151,12 @@ const ProfilePage = () => {
   const handleCancelEditFormModal = () => {
     setShowEditModal(false)
     setSelectedForm(null)
+  }
+
+  // Function to handle form update confirmation
+  const handleEditFormConfirm = () => {
+    fetchForms() // refetch
+    handleCancelEditFormModal()
   }
 
   if (!session?.user) {
@@ -157,6 +177,13 @@ const ProfilePage = () => {
 
   return (
     <div className="bg-gray-900 min-h-screen text-white">
+      <Popup
+        type={messagePopupType}
+        message={popupMessage}
+        show={showMessagePopup}
+        onClose={closePopup}
+      />
+
       <header className="text-center py-16">
         <h1 className="text-3xl sm:text-5xl text-blue-300">
           Welcome to your profile!
@@ -195,19 +222,19 @@ const ProfilePage = () => {
                     <Link href={`/form/${form._id}`}>
                       <h3 className="text-lg text-blue-300">{form.title}</h3>
                     </Link>
-                   <div className="flex">
-                   <ButtonComponent
-                      buttonBg="bg-blue-600"
-                      buttonTitle="Edit"
-                      className="mr-2"
-                      onClick={() => handleShowEditFormModal(form)}
-                    />                    
-                    <ButtonComponent
-                      buttonBg="bg-red-500"
-                      buttonTitle="Delete"
-                      onClick={() => handleShowDeletePopup(form)}
-                    />
-                   </div>
+                    <div className="flex">
+                      <ButtonComponent
+                        buttonBg="bg-blue-600"
+                        buttonTitle="Edit"
+                        className="mr-2"
+                        onClick={() => handleShowEditFormModal(form)}
+                      />
+                      <ButtonComponent
+                        buttonBg="bg-red-500"
+                        buttonTitle="Delete"
+                        onClick={() => handleShowDeletePopup(form)}
+                      />
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -230,11 +257,16 @@ const ProfilePage = () => {
           />
         )}
 
-        {
-          showEditModal && selectedForm && (
-            <EditFormModal form={selectedForm} title={""} actionName={"Confirm"} onConfirm={""} onCancel={handleCancelEditFormModal} />
-          )
-        }
+        {/* Edit Form Modal */}
+        {showEditModal && selectedForm && (
+          <EditFormModal
+            form={selectedForm}
+            title={"Edit Form"}
+            actionName={"Confirm"}
+            onConfirm={handleEditFormConfirm}
+            onCancel={handleCancelEditFormModal}
+          />
+        )}
       </main>
     </div>
   )
