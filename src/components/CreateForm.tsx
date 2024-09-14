@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { FormEvent, useState } from "react"
 
 const CreateForm = ({ onSubmit, onSuccess }) => {
   const [title, setTitle] = useState("")
@@ -16,7 +16,7 @@ const CreateForm = ({ onSubmit, onSuccess }) => {
     setFields(updatedFields)
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
     onSubmit({ title, fields })
   }
@@ -24,14 +24,14 @@ const CreateForm = ({ onSubmit, onSuccess }) => {
   return (
     <>
       {/* <div className="mx-auto max-w-screen-xl px-4 py-16 sm:px-6 lg:px-8"> */}
-      <div className="mx-auto max-w-screen-xl border border-gray-800 p-2 sm:p-6 rounded-lg">
+      <div className=" sm:mx-auto mx-4 max-w-screen-xl border border-gray-800 p-2 sm:p-6 rounded-lg sm:py-4 py-16">
         <h1 className="text-center text-3xl font-bold text-blue-300 sm:text-3xl">
           Create Form
         </h1>
 
         <p className="mx-auto mt-4 max-w-md text-center text-gray-500">
-          Start by creating a Respondly form by filling the above
-          fields according to your needs
+          Start by creating a Respondly form by filling the above fields
+          according to your needs
         </p>
 
         <form
@@ -96,10 +96,10 @@ const CreateForm = ({ onSubmit, onSuccess }) => {
           </button>
         </form>
         {onSuccess && (
-        <div className="mb-4 p-3 text-xl text-green-500 text-center">
-          {onSuccess}
-        </div>
-      )}
+          <div className="mb-4 p-3 text-xl text-green-500 text-center">
+            {onSuccess}
+          </div>
+        )}
       </div>
     </>
   )

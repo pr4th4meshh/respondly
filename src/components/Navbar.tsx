@@ -68,17 +68,22 @@ const Navbar = () => {
 
             <div className="flex items-center gap-4">
               {session && session.user?.name ? (
-                <Link href="/profile" className="flex items-center">
+                <>
                   <Image
                     priority
                     height={50}
                     width={50}
                     src="https://images.unsplash.com/photo-1640960543409-dbe56ccc30e2?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MzJ8fGRlZmF1bHQlMjBhdmF0YXJ8ZW58MHx8MHx8fDA%3D"
                     alt="Avatar_Image"
-                    className="h-[40px] w-[40px] mr-2 rounded-full"
+                    className="h-[40px] w-[40px] rounded-full"
                   />
                   <h1 className="text-gray-300">Hello, {session.user?.name}</h1>
+                  
+                <Link href="/profile" className="flex items-center text-white bg-blue-600 px-4 py-2 rounded">
+                View Profile
                 </Link>
+                  </>
+                // </Link>
               ) : (
                 <div className="sm:flex sm:gap-4">
                   <Link

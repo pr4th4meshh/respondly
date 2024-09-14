@@ -1,6 +1,7 @@
 "use client"
 
 import CreateForm from "@/components/CreateForm"
+import Popup from "@/components/Popup"
 import { IForm } from "@/models/Form"
 import React, { useEffect, useState } from "react"
 
@@ -10,6 +11,17 @@ const CreateNewForm = () => {
   const [showPopup, setShowPopup] = useState(false)
   const [selectedForm, setSelectedForm] = useState<IForm | null>(null)
   const [successMessage, setSuccessMessage] = useState("")
+
+  // Toast Message States
+  const [messagePopupType, setMessagePopupType] = useState<
+    "success" | "error" | "warning"
+  >("success")
+  const [popupMessage, setPopupMessage] = useState("")
+  const [showMessagePopup, setShowMessagePopup] = useState(false)
+
+  const closePopup = () => {
+    setShowMessagePopup(false)
+  }
 
   // Fetch forms from the API
   const fetchForms = async () => {
@@ -50,6 +62,9 @@ const CreateNewForm = () => {
 
         // Show success message
         setSuccessMessage("Form created successfully!")
+        setShowMessagePopup(true)
+        setPopupMessage("Form created successfully!")
+        setMessagePopupType("success")
       } else {
         const errorData = await response.json()
         console.error("Failed to add form:", errorData.error)
@@ -61,6 +76,12 @@ const CreateNewForm = () => {
 
   return (
     <div className=" h-hero-height bg-gray-900 flex justify-center items-center">
+      <Popup
+        type={messagePopupType}
+        message={popupMessage}
+        show={showMessagePopup}
+        onClose={closePopup}
+      />
       <CreateForm onSuccess={successMessage} onSubmit={handleCreateForm} />
     </div>
   )

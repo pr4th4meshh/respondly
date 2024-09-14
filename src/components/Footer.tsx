@@ -2,21 +2,27 @@ import Link from "next/link"
 import React from "react"
 
 const Footer = () => {
+  const currentYear = new Date().getFullYear()
   return (
     <footer className="bg-gray-100 dark:bg-gray-900">
       <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="flex justify-center text-blue-600 dark:text-blue-300">
-        <span className="bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 bg-clip-text text-3xl font-extrabold text-transparent sm:text-5xl">
-              Respondly
-            </span>
+          <span className="bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 bg-clip-text text-3xl font-extrabold text-transparent sm:text-5xl">
+            Respondly
+          </span>
         </div>
 
         <p className="mx-auto mt-6 max-w-md text-center leading-relaxed text-gray-500 dark:text-gray-400">
           Respondly.com | Created with ❤️ by{" "}
-          <Link rel="noopener" target="_blank" className="text-blue-300" href="https://github.com/pr4th4meshh">
+          <Link
+            rel="noopener"
+            target="_blank"
+            className="text-blue-300"
+            href="https://github.com/pr4th4meshh"
+          >
             @pr4th4meshh
           </Link>{" "}
-          2024
+          {currentYear}
         </p>
 
         <ul className="mt-8 flex justify-center gap-6 md:gap-8">

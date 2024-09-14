@@ -177,6 +177,7 @@ const ProfilePage = () => {
 
   return (
     <div className="bg-gray-900 min-h-screen text-white">
+      <div className="container mx-auto">
       <Popup
         type={messagePopupType}
         message={popupMessage}
@@ -190,14 +191,14 @@ const ProfilePage = () => {
         </h1>
       </header>
       <main className="container mx-auto px-4">
-        <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start">
-          <div className="lg:w-1/2 mb-8 lg:mb-0">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start">
+          <div className="sm:w-1/2 mb-8 sm:mb-0">
             {/* Pass the complete user object to ProfileForm */}
             {session?.user?.email && (
               <ProfileForm onSubmit={handleEditUser} user={session?.user} />
             )}
           </div>
-          <div className="lg:w-1/2 bg-gray-800 p-8 rounded-lg">
+          <div className="sm:w-1/2 bg-gray-800 p-8 rounded-lg">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl text-blue-300">Your Forms:</h2>
               <Link href="/form/create">
@@ -268,6 +269,7 @@ const ProfilePage = () => {
           />
         )}
       </main>
+      </div>
     </div>
   )
 }
