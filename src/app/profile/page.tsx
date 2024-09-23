@@ -221,9 +221,19 @@ const ProfilePage = () => {
                     className="bg-gray-700 p-4 rounded-lg flex justify-between items-center"
                   >
                     <Link href={`/form/${form._id}`}>
-                      <h3 className="text-lg text-blue-300">{form.title}</h3>
+                      <h3 className="text-lg text-blue-300">
+                        {
+                          form.title.split(" ").length > 4 ? form.title.split(" ").slice(0 ,4).join(" ") + ".." : form.title
+                        }
+                      </h3>
                     </Link>
                     <div className="flex">
+                    <ButtonComponent
+                        buttonBg="bg-green-600"
+                        buttonTitle="View Responses"
+                        className="mr-2"
+                        onClick={() => handleShowEditFormModal(form)}
+                      />
                       <ButtonComponent
                         buttonBg="bg-blue-600"
                         buttonTitle="Edit"
