@@ -23,19 +23,51 @@ const FormPage = ({ params }: { params: { formId: string } }) => {
     }))
   }
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault()
+
+  //   // Ensure `responses` is an object with label-answer pairs
+  //   const formattedResponses = Object.entries(responses).map(
+  //     ([label, answer]) => ({
+  //       label,
+  //       answer,
+  //     })
+  //   )
+
+  //   console.log("Formatted Responses:", formattedResponses) // Debugging line
+
+  //   try {
+  //     const response = await fetch(`/api/response/${params.formId}`, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({ responses: formattedResponses }),
+  //     })
+
+  //     const result = await response.json()
+
+  //     if (response.ok) {
+  //       setSuccessMessage("Response submitted successfully!")
+  //       setResponses({})
+  //     } else {
+  //       console.error("Error submitting response:", result.error)
+  //     }
+  //   } catch (error) {
+  //     console.error("Error submitting response:", error)
+  //   }
+  // }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
-
-    // Ensure `responses` is an object with label-answer pairs
+  
     const formattedResponses = Object.entries(responses).map(
-      ([label, answer]) => ({
+      ([label, value]) => ({
         label,
-        answer,
+        value, // Use "value" instead of "answer"
       })
     )
-
-    console.log("Formatted Responses:", formattedResponses) // Debugging line
-
+  
     try {
       const response = await fetch(`/api/response/${params.formId}`, {
         method: "POST",
@@ -44,9 +76,9 @@ const FormPage = ({ params }: { params: { formId: string } }) => {
         },
         body: JSON.stringify({ responses: formattedResponses }),
       })
-
+  
       const result = await response.json()
-
+  
       if (response.ok) {
         setSuccessMessage("Response submitted successfully!")
         setResponses({})
@@ -57,6 +89,7 @@ const FormPage = ({ params }: { params: { formId: string } }) => {
       console.error("Error submitting response:", error)
     }
   }
+  
 
   if (!form) return <div className="h-screen bg-gray-900">Loading form...</div>
 

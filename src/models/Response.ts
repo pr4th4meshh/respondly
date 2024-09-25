@@ -10,7 +10,7 @@ const ResponseSchema: Schema = new Schema({
   responses: [
     {
       label: { type: String, required: true },
-      answer: { type: String, required: true },
+      value: { type: String, required: true },
     },
   ],
 });

@@ -159,6 +159,7 @@ const ProfilePage = () => {
     handleCancelEditFormModal()
   }
 
+  console.log(forms, "FORMS")
   if (!session?.user) {
     return (
       <div className="h-hero-height bg-gray-900 flex justify-center items-center flex-col">
