@@ -16,47 +16,12 @@ const FormPage = ({ params }: { params: { formId: string } }) => {
     }
   }, [params.formId])
 
-  const handleInputChange = (index, value) => {
+  const handleInputChange = (label, value) => {
     setResponses((prevResponses) => ({
       ...prevResponses,
-      [index]: value,
+      [label]: value,
     }))
   }
-
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault()
-
-  //   // Ensure `responses` is an object with label-answer pairs
-  //   const formattedResponses = Object.entries(responses).map(
-  //     ([label, answer]) => ({
-  //       label,
-  //       answer,
-  //     })
-  //   )
-
-  //   console.log("Formatted Responses:", formattedResponses) // Debugging line
-
-  //   try {
-  //     const response = await fetch(`/api/response/${params.formId}`, {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({ responses: formattedResponses }),
-  //     })
-
-  //     const result = await response.json()
-
-  //     if (response.ok) {
-  //       setSuccessMessage("Response submitted successfully!")
-  //       setResponses({})
-  //     } else {
-  //       console.error("Error submitting response:", result.error)
-  //     }
-  //   } catch (error) {
-  //     console.error("Error submitting response:", error)
-  //   }
-  // }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -64,7 +29,7 @@ const FormPage = ({ params }: { params: { formId: string } }) => {
     const formattedResponses = Object.entries(responses).map(
       ([label, value]) => ({
         label,
-        value, // Use "value" instead of "answer"
+        value
       })
     )
   
@@ -80,6 +45,7 @@ const FormPage = ({ params }: { params: { formId: string } }) => {
       const result = await response.json()
   
       if (response.ok) {
+        console.log("FR:", formattedResponses, "RESES:", responses)
         setSuccessMessage("Response submitted successfully!")
         setResponses({})
       } else {
@@ -107,9 +73,9 @@ const FormPage = ({ params }: { params: { formId: string } }) => {
                 <label>{field.label}<span className="text-red-500 ml-0.5">*</span></label>
                 <input
                   type={field.type}
-                  value={responses[index] || ""}
+                  value={responses[field.label] || ""}
                   className="w-full rounded-lg bg-gray-800 border-gray-200 p-4 pe-12 text-sm shadow-sm mt-1 mb-2"
-                  onChange={(e) => handleInputChange(index, e.target.value)}
+                  onChange={(e) => handleInputChange(field.label, e.target.value)}
                   placeholder="Your response.."
                   required
                 />

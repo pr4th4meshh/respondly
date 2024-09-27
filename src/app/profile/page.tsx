@@ -229,12 +229,14 @@ const ProfilePage = () => {
                       </h3>
                     </Link>
                     <div className="flex">
+                    <Link href={`/responses/${form._id}`} >
                     <ButtonComponent
                         buttonBg="bg-green-600"
                         buttonTitle="View Responses"
                         className="mr-2"
                         onClick={() => handleShowEditFormModal(form)}
                       />
+                    </Link>
                       <ButtonComponent
                         buttonBg="bg-blue-600"
                         buttonTitle="Edit"

@@ -82,9 +82,9 @@ const Navbar = () => {
                   <Link
                     href="/profile"
                     className={`flex items-center text-white bg-blue-600 px-4 py-2 rounded ${
-                      window.location.pathname === "/profile"
-                        ? "hidden"
-                        : "block"
+                      window.location.pathname === "/" 
+                        ? "block"
+                        : "hidden"
                     }`}
                   >
                     View Profile
