@@ -32,7 +32,9 @@ const ProfilePage = () => {
   const { data: session, update } = useSession()
 
   // Toast Message States
-  const [messagePopupType, setMessagePopupType] = useState<"success" | "error" | "warning">("success")
+  const [messagePopupType, setMessagePopupType] = useState<
+    "success" | "error" | "warning"
+  >("success")
   const [popupMessage, setPopupMessage] = useState("")
   const [showMessagePopup, setShowMessagePopup] = useState(false)
 
@@ -179,109 +181,108 @@ const ProfilePage = () => {
   return (
     <div className="bg-gray-900 min-h-screen text-white">
       <div className="container mx-auto">
-      <Popup
-        type={messagePopupType}
-        message={popupMessage}
-        show={showMessagePopup}
-        onClose={closePopup}
-      />
+        <Popup
+          type={messagePopupType}
+          message={popupMessage}
+          show={showMessagePopup}
+          onClose={closePopup}
+        />
 
-      <header className="text-center py-16">
-        <h1 className="text-3xl sm:text-5xl text-blue-300">
-          Welcome to your profile!
-        </h1>
-      </header>
-      <main className="container mx-auto px-4">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start">
-          <div className="sm:w-1/2 mb-8 sm:mb-0">
-            {/* Pass the complete user object to ProfileForm */}
-            {session?.user?.email && (
-              <ProfileForm onSubmit={handleEditUser} user={session?.user} />
-            )}
-          </div>
-          <div className="sm:w-1/2 bg-gray-800 p-8 rounded-lg">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl text-blue-300">Your Forms:</h2>
-              <Link href="/form/create">
-                <ButtonComponent
-                  buttonTitle="Create form"
-                  buttonBg="bg-blue-600"
-                  icon={<IoAddCircleOutline className="mr-1 text-lg" />}
-                />
-              </Link>
+        <header className="text-center py-16">
+          <h1 className="text-3xl sm:text-5xl text-blue-300">
+            Welcome to your profile!
+          </h1>
+        </header>
+        <main className="container mx-auto px-4">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start">
+            <div className="sm:w-1/2 mb-8 sm:mb-0">
+              {/* Pass the complete user object to ProfileForm */}
+              {session?.user?.email && (
+                <ProfileForm onSubmit={handleEditUser} user={session?.user} />
+              )}
             </div>
-            {loading ? (
-              <p className="text-center text-lg text-gray-400">
-                Loading forms...
-              </p>
-            ) : forms.length > 0 ? (
-              <ul className="space-y-4">
-                {forms.map((form) => (
-                  <li
-                    key={form._id}
-                    className="bg-gray-700 p-4 rounded-lg flex justify-between items-center"
-                  >
-                    <Link href={`/form/${form._id}`}>
-                      <h3 className="text-lg text-blue-300">
-                        {
-                          form.title.split(" ").length > 4 ? form.title.split(" ").slice(0 ,4).join(" ") + ".." : form.title
-                        }
-                      </h3>
-                    </Link>
-                    <div className="flex">
-                    <Link href={`/responses/${form._id}`} >
-                    <ButtonComponent
-                        buttonBg="bg-green-600"
-                        buttonTitle="View Responses"
-                        className="mr-2"
-                        onClick={() => handleShowEditFormModal(form)}
-                      />
-                    </Link>
-                      <ButtonComponent
-                        buttonBg="bg-blue-600"
-                        buttonTitle="Edit"
-                        className="mr-2"
-                        onClick={() => handleShowEditFormModal(form)}
-                      />
-                      <ButtonComponent
-                        buttonBg="bg-red-500"
-                        buttonTitle="Delete"
-                        onClick={() => handleShowDeletePopup(form)}
-                      />
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-center text-xl text-gray-400">
-                No forms available
-              </p>
-            )}
+            <div className="sm:w-1/2 bg-gray-800 p-8 rounded-lg">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl text-blue-300">Your Forms:</h2>
+                <Link href="/form/create">
+                  <ButtonComponent
+                    buttonTitle="Create form"
+                    buttonBg="bg-blue-600"
+                    icon={<IoAddCircleOutline className="mr-1 text-lg" />}
+                  />
+                </Link>
+              </div>
+              {loading ? (
+                <p className="text-center text-lg text-gray-400">
+                  Loading forms...
+                </p>
+              ) : forms.length > 0 ? (
+                <ul className="space-y-4">
+                  {forms.map((form) => (
+                    <li
+                      key={form._id}
+                      className="bg-gray-700 p-4 rounded-lg flex justify-between items-center"
+                    >
+                      <Link href={`/form/${form._id}`}>
+                        <h3 className="text-lg text-blue-300">
+                          {form.title.split(" ").length > 4
+                            ? form.title.split(" ").slice(0, 4).join(" ") + ".."
+                            : form.title}
+                        </h3>
+                      </Link>
+                      <div className="flex">
+                        <Link href={`/responses/${form._id}`}>
+                          <ButtonComponent
+                            buttonBg="bg-green-600"
+                            buttonTitle="View Responses"
+                            className="mr-2"
+                          />
+                        </Link>
+                        <ButtonComponent
+                          buttonBg="bg-blue-600"
+                          buttonTitle="Edit"
+                          className="mr-2"
+                          onClick={() => handleShowEditFormModal(form)}
+                        />
+                        <ButtonComponent
+                          buttonBg="bg-red-500"
+                          buttonTitle="Delete"
+                          onClick={() => handleShowDeletePopup(form)}
+                        />
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-center text-xl text-gray-400">
+                  No forms available
+                </p>
+              )}
+            </div>
           </div>
-        </div>
 
-        {/* Delete Confirmation Modal */}
-        {showPopup && selectedForm && (
-          <ConfirmModal
-            title="Are you sure you want to delete this form?"
-            subTitle="This action cannot be undone."
-            actionName="Confirm"
-            onConfirm={handleConfirmDelete}
-            onCancel={handleCancelDelete}
-          />
-        )}
+          {/* Delete Confirmation Modal */}
+          {showPopup && selectedForm && (
+            <ConfirmModal
+              title="Are you sure you want to delete this form?"
+              subTitle="This action cannot be undone."
+              actionName="Confirm"
+              onConfirm={handleConfirmDelete}
+              onCancel={handleCancelDelete}
+            />
+          )}
 
-        {/* Edit Form Modal */}
-        {showEditModal && selectedForm && (
-          <EditFormModal
-            form={selectedForm}
-            title={"Edit Form"}
-            actionName={"Confirm"}
-            onConfirm={handleEditFormConfirm}
-            onCancel={handleCancelEditFormModal}
-          />
-        )}
-      </main>
+          {/* Edit Form Modal */}
+          {showEditModal && selectedForm && (
+            <EditFormModal
+              form={selectedForm}
+              title={"Edit Form"}
+              actionName={"Confirm"}
+              onConfirm={handleEditFormConfirm}
+              onCancel={handleCancelEditFormModal}
+            />
+          )}
+        </main>
       </div>
     </div>
   )
