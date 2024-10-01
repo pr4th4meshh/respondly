@@ -2,7 +2,7 @@ import React from "react"
 
 const FAQs = () => {
   return (
-    <div className="bg-gray-900 py-8 sm:py-12 lg:py-16 px-4">
+    <section id="faqs" className="bg-gray-900 py-8 sm:py-12 lg:py-16 px-4">
       <div className="container mx-auto divide-y divide-gray-100 rounded-xl border border-gray-100 bg-white dark:divide-gray-800 dark:border-gray-800 dark:bg-gray-900">
         <details
           className="group p-6 [&_summary::-webkit-details-marker]:hidden"
@@ -141,7 +141,7 @@ const FAQs = () => {
           </p>
         </details>
       </div>
-    </div>
+    </section>
   )
 }
 

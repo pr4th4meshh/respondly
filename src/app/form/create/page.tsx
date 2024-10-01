@@ -75,7 +75,7 @@ const CreateNewForm = () => {
   }
 
   return (
-    <div className=" h-hero-height bg-gray-900 flex justify-center items-center">
+    <div className="min-h-hero-height h-auto bg-gray-900 flex justify-center items-center">
       <Popup
         type={messagePopupType}
         message={popupMessage}

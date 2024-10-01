@@ -2,13 +2,19 @@
 import { useSession } from "next-auth/react"
 import Image from "next/image"
 import Link from "next/link"
-import React from "react"
+import React, { useState } from "react"
+import { CgClose } from "react-icons/cg"
 
 const Navbar = () => {
   const { data: session } = useSession()
+  const [isSubNavOpen, setIsSubNavOpen] = useState(true)
+
+  const closeSubNav = () => {
+    setIsSubNavOpen(false)
+  }
   return (
     <>
-      <header className="bg-white dark:bg-gray-900">
+      <header className="bg-white dark:bg-gray-900 border-b border-b-gray-700">
         <div className="mx-auto flex h-16 max-w-screen-xl items-center gap-8 px-4 sm:px-6 lg:px-8">
           <Link className="block text-blue-600 dark:text-blue-300" href="/">
             <span className="bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 bg-clip-text text-2xl font-extrabold text-transparent sm:text-3xl">
@@ -22,7 +28,7 @@ const Navbar = () => {
                 <li>
                   <a
                     className="text-gray-500 transition hover:text-gray-500/75 dark:text-white dark:hover:text-white/75"
-                    href="#"
+                    href="#about"
                   >
                     About
                   </a>
@@ -31,7 +37,7 @@ const Navbar = () => {
                 <li>
                   <a
                     className="text-gray-500 transition hover:text-gray-500/75 dark:text-white dark:hover:text-white/75"
-                    href="#"
+                    href="#howto"
                   >
                     How To
                   </a>
@@ -40,27 +46,9 @@ const Navbar = () => {
                 <li>
                   <a
                     className="text-gray-500 transition hover:text-gray-500/75 dark:text-white dark:hover:text-white/75"
-                    href="#"
+                    href="#faqs"
                   >
                     FAQs
-                  </a>
-                </li>
-
-                <li>
-                  <a
-                    className="text-gray-500 transition hover:text-gray-500/75 dark:text-white dark:hover:text-white/75"
-                    href="#"
-                  >
-                    Team
-                  </a>
-                </li>
-
-                <li>
-                  <a
-                    className="text-gray-500 transition hover:text-gray-500/75 dark:text-white dark:hover:text-white/75"
-                    href="#"
-                  >
-                    Blog
                   </a>
                 </li>
               </ul>
@@ -82,9 +70,7 @@ const Navbar = () => {
                   <Link
                     href="/profile"
                     className={`flex items-center text-white bg-blue-600 px-4 py-2 rounded ${
-                      window.location.pathname === "/" 
-                        ? "block"
-                        : "hidden"
+                      window.location.pathname === "/" ? "block" : "hidden"
                     }`}
                   >
                     View Profile
@@ -130,7 +116,11 @@ const Navbar = () => {
           </div>
         </div>
       </header>
-      <div className="bg-blue-600 px-4 py-3 text-white">
+      <div
+        className={`bg-blue-600 px-4 py-3 text-white ${
+          isSubNavOpen ? "block" : "hidden"
+        }`}
+      >
         <p className="text-center text-sm font-medium">
           Love Respondly?{" "}
           <Link
@@ -141,6 +131,9 @@ const Navbar = () => {
           >
             Give it a star on GitHub!
           </Link>
+          <span className="float-end text-lg cursor-pointer">
+            <CgClose onClick={closeSubNav} />
+          </span>
         </p>
       </div>
     </>

@@ -7,7 +7,7 @@ import {
 
 const HowTo = () => {
   return (
-    <section className="bg-gray-900 text-white">
+    <section id="howto" className="bg-gray-900 text-white">
       <div className="mx-auto max-w-screen-xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-16">
         <div className="mx-auto max-w-lg text-center">
           <h1 className="text-blue-300 font-bold text-3xl sm:text-5xl">

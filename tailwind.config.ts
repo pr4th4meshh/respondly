@@ -15,6 +15,9 @@ const config: Config = {
       },
       height: {
         "hero-height": "calc(100vh - 100px)"
+      },
+      minHeight: {
+        "hero-height": "calc(100vh - 100px)"
       }
     },
   },

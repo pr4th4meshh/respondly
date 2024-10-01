@@ -2,7 +2,7 @@
 import { FormEvent, useState } from "react";
 
 const CreateForm = ({onSuccess, onSubmit}) => {
-  const [title, setTitle] = useState("");
+  const [title, setTitle] = useState("Untitled Form");
   const [fields, setFields] = useState([{ label: "", type: "text", options: [] }]);
 
   const handleAddField = () => {
@@ -48,7 +48,7 @@ const CreateForm = ({onSuccess, onSubmit}) => {
         Start by creating a form by filling the fields according to your needs.
       </p>
 
-      <form onSubmit={handleSubmit} className="mb-0 mt-6 space-y-4 rounded-lg p-1 sm:p-6 lg:p-8 text-gray-300">
+      <form onSubmit={handleSubmit} className="h-auto overflow-hidden mb-0 mt-6 space-y-4 rounded-lg p-1 sm:p-6 lg:p-8 text-gray-300">
         <input
           type="text"
           placeholder="Form Title"
