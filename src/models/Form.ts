@@ -3,7 +3,8 @@ import mongoose, { Document, Schema } from "mongoose"
 export interface IForm extends Document {
   creator: string
   title: string
-  fields: Array<{ label: string; type: string }>
+
+  fields: Array<{ label: string; type: string, options?: string[] }>
   responses: Array<{ label: string; value: string }>
 }
 
@@ -14,13 +15,14 @@ const FormSchema: Schema = new Schema(
     fields: [
       {
         label: { type: String, required: true },
-        type: { type: String, requied: true },
+        type: { type: String, required: true },
+        options: { type: [String], default: [] },
       },
     ],
     responses: [
       {
-        label: { type: String, required: true }, // Field label
-        value: { type: String, required: true }, // Field response
+        label: { type: String, required: true },
+        value: { type: String, required: true },
       },
     ],
   },
