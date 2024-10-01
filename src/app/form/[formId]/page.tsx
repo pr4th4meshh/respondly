@@ -94,13 +94,11 @@ const FormPage = ({ params }: { params: { formId: string } }) => {
             {form.fields.map((field, index) => (
               <div key={index}>
                 <label>
-                  {field.label}
+                  {field.label.charAt(0).toUpperCase() + field.label.slice(1)}
                   <span className="text-red-500 ml-0.5">*</span>
                 </label>
 
-                {field.type === "text" ||
-                field.type === "email" ||
-                field.type === "number" ? (
+                {["text", "email", "number"].includes(field.type) ? (
                   <input
                     type={field.type}
                     value={responses[field.label] || ""}

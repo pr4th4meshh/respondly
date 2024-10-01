@@ -1,68 +1,68 @@
-"use client"
-import React, { useEffect, useState } from "react"
-import axios from "axios"
+"use client";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import ResponseChart from "../_components/ResponseChart";
 
 interface FormField {
-  label: string
-  type: string
+  label: string;
+  type: string;
+  options?: string[];
 }
 
 interface FormResponse {
-  _id: string
-  label: string
-  value: string | number
+  _id: string;
+  label: string;
+  value: string | number;
 }
 
 interface FormData {
-  _id: string
-  title: string
-  fields: FormField[]
-  responses: FormResponse[]
+  _id: string;
+  title: string;
+  fields: FormField[];
+  responses: FormResponse[];
 }
 
 const ResponsePage: React.FC = ({ params }) => {
-  const formId = params.formId
-  const [formData, setFormData] = useState<FormData | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [form, setForm] = useState(null)
+  const formId = params.formId;
+  const [formData, setFormData] = useState<FormData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [form, setForm] = useState(null);
 
   useEffect(() => {
-    if (params.formId) {
-      fetch(`/api/forms/${params.formId}`)
+    if (formId) {
+      fetch(`/api/forms/${formId}`)
         .then((response) => response.json())
         .then((data) => setForm(data.data))
-        .catch((error) => console.error("Error fetching form:", error))
+        .catch((error) => console.error("Error fetching form:", error));
     }
-  }, [params.formId])
-
-  console.log(form)
+  }, [formId]);
 
   useEffect(() => {
     const fetchFormData = async () => {
       if (formId) {
         try {
-          const response = await axios.get(`/api/response/${formId}`)
-          setFormData(response.data)
+          const response = await axios.get(`/api/response/${formId}`);
+          setFormData(response.data);
         } catch (err) {
-          setError("Failed to fetch form data")
+          setError("Failed to fetch form data");
         } finally {
-          setLoading(false)
+          setLoading(false);
         }
       }
-    }
+    };
 
-    fetchFormData()
-  }, [formId])
-
+    fetchFormData();
+  }, [formId]);
+  
   if (loading)
     return (
       <div className="h-[90vh] bg-gray-900 text-white flex justify-center items-center text-center">
         <AiOutlineLoading3Quarters aria-label="Loading.." className="animate-spin text-4xl" />
         <span className="ml-4 text-2xl">Loading, please wait...</span>
       </div>
-    )
+    );
 
   if (error)
     return (
@@ -77,24 +77,15 @@ const ResponsePage: React.FC = ({ params }) => {
           </button>
         </div>
       </div>
-    )
+    );
 
+  // show message if there are no responses
   if (formData?.data.length === 0)
     return (
       <div className="h-[90vh] bg-gray-900 text-white flex justify-center items-center text-center">
-        <p className="text-3xl">This form hasn&apos;t got any responses yet </p>
+        <p className="text-3xl">This form hasn&apos;t got any responses yet.</p>
       </div>
-    )
-
-  // Group responses by label
-  const groupedResponses = formData?.data.reduce((acc, response) => {
-    const { label, value } = response
-    if (!acc[label]) {
-      acc[label] = []
-    }
-    acc[label].push(value)
-    return acc
-  }, {} as Record<string, (string | number)[]>)
+    );
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
@@ -103,25 +94,49 @@ const ResponsePage: React.FC = ({ params }) => {
           {form?.title} Responses
         </h1>
 
-        {/* Display grouped responses by label */}
-        {groupedResponses &&
-          Object.entries(groupedResponses).map(([label, values], index) => (
+        {/* display responses for each field */}
+        {form?.fields.map((field, index) => {
+          const responseCounts: Record<string, number> = {}; // COUNT RESPONSES (CHARTS)
+          const textResponses: string[] = []; // TEXT RESPONSES
+
+          // count responses based on field type
+          formData.data.forEach((response) => {
+            const value = response.value as string; // transform to string
+            if (response.label === field.label) {
+              if (field.type === 'text') {
+                textResponses.push(value); // count text response
+              } else if (field.options?.includes(value)) {
+                responseCounts[value] = (responseCounts[value] || 0) + 1; // count multiple-choice responses
+
+                // responseCounts[value] = (responseCounts[value] || 0) 
+                // means if there is response count or the count of response value is 0 
+              }
+            }
+          });
+
+          return (
             <div key={index} className="mb-8 p-4 bg-gray-800 rounded-md shadow-lg">
               <h2 className="text-2xl font-semibold text-blue-200">
-                {index + 1}. {label.charAt(0).toUpperCase() + label.slice(1)}
+                {index + 1}. {field.label.charAt(0).toUpperCase() + field.label.slice(1)}
               </h2>
-              <ul className="ml-4 mt-2 list-disc list-inside">
-                {values.map((value, i) => (
-                  <li key={i} className="text-lg">
-                    {value.charAt(0).toUpperCase() + value.slice(1)}
-                  </li>
-                ))}
-              </ul>
+              
+              {/* displaying text responses */}
+              {field.type === 'text' ? (
+                <ul className="ml-4 mt-2 list-disc list-inside">
+                  {textResponses.map((response, i) => (
+                    <li key={i} className="text-lg">{response}</li>
+                  ))}
+                </ul>
+              ) : (
+                // displaying count responses in chart
+                <ResponseChart responseCounts={responseCounts} />
+              )}
             </div>
-          ))}
+          );
+        })}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ResponsePage
+export default ResponsePage;
