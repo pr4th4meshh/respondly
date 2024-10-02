@@ -23,24 +23,30 @@ interface FormData {
   responses: FormResponse[];
 }
 
-const ResponsePage: React.FC = ({ params }) => {
+const ResponsePage: React.FC<{ params: { formId: string } }> = ({ params }) => {
   const formId = params.formId;
   const [formData, setFormData] = useState<FormData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [form, setForm] = useState(null);
-
-  useEffect(() => {
-    if (formId) {
-      fetch(`/api/forms/${formId}`)
-        .then((response) => response.json())
-        .then((data) => setForm(data.data))
-        .catch((error) => console.error("Error fetching form:", error));
-    }
-  }, [formId]);
+  const [form, setForm] = useState<FormData | null>(null);
 
   useEffect(() => {
     const fetchFormData = async () => {
+      if (formId) {
+        try {
+          const response = await axios.get(`/api/forms/${formId}`);
+          setForm(response.data.data); // Fetching form details
+        } catch (error) {
+          console.error("Error fetching form:", error);
+        }
+      }
+    };
+
+    fetchFormData();
+  }, [formId]);
+
+  useEffect(() => {
+    const fetchResponses = async () => {
       if (formId) {
         try {
           const response = await axios.get(`/api/response/${formId}`);
@@ -53,9 +59,9 @@ const ResponsePage: React.FC = ({ params }) => {
       }
     };
 
-    fetchFormData();
+    fetchResponses();
   }, [formId]);
-  
+
   if (loading)
     return (
       <div className="h-[90vh] bg-gray-900 text-white flex justify-center items-center text-center">
@@ -79,11 +85,11 @@ const ResponsePage: React.FC = ({ params }) => {
       </div>
     );
 
-  // show message if there are no responses
+  // Show message if there are no responses
   if (formData?.data.length === 0)
     return (
       <div className="h-[90vh] bg-gray-900 text-white flex justify-center items-center text-center">
-        <p className="text-3xl">This form hasn&apos;t got any responses yet.</p>
+        <p className="text-3xl">This form hasn't got any responses yet.</p>
       </div>
     );
 
@@ -94,22 +100,24 @@ const ResponsePage: React.FC = ({ params }) => {
           {form?.title} Responses
         </h1>
 
-        {/* display responses for each field */}
+        {/* Display responses for each field */}
         {form?.fields.map((field, index) => {
-          const responseCounts: Record<string, number> = {}; // COUNT RESPONSES (CHARTS)
-          const textResponses: string[] = []; // TEXT RESPONSES
+          const responseCounts: Record<string, number> = {}; // Count responses (for charts)
+          const textResponses: string[] = []; // Store text responses
 
-          // count responses based on field type
+          // Count responses based on field type
           formData.data.forEach((response) => {
-            const value = response.value as string; // transform to string
+            const value = response.value as string; // Transform to string
+            console.log("Field Label:", field.label); // Debugging output
+            console.log("Response Label:", response.label); // Debugging output
+
+            // Check if the response label matches the current field's label
             if (response.label === field.label) {
               if (field.type === 'text') {
-                textResponses.push(value); // count text response
+                textResponses.push(value); // Add text response
               } else if (field.options?.includes(value)) {
-                responseCounts[value] = (responseCounts[value] || 0) + 1; // count multiple-choice responses
-
-                // responseCounts[value] = (responseCounts[value] || 0) 
-                // means if there is response count or the count of response value is 0 
+                // Count responses based on options
+                responseCounts[value] = (responseCounts[value] || 0) + 1; // Increment count for option
               }
             }
           });
@@ -120,15 +128,19 @@ const ResponsePage: React.FC = ({ params }) => {
                 {index + 1}. {field.label.charAt(0).toUpperCase() + field.label.slice(1)}
               </h2>
               
-              {/* displaying text responses */}
+              {/* Displaying text responses */}
               {field.type === 'text' ? (
                 <ul className="ml-4 mt-2 list-disc list-inside">
-                  {textResponses.map((response, i) => (
-                    <li key={i} className="text-lg">{response}</li>
-                  ))}
+                  {textResponses.length > 0 ? (
+                    textResponses.map((response, i) => (
+                      <li key={i} className="text-lg">{response}</li>
+                    ))
+                  ) : (
+                    <li className="text-lg">No responses recorded.</li>
+                  )}
                 </ul>
               ) : (
-                // displaying count responses in chart
+                // Displaying count responses in chart
                 <ResponseChart responseCounts={responseCounts} />
               )}
             </div>

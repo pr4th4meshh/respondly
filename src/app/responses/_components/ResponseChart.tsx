@@ -34,7 +34,6 @@ const ResponseChart: React.FC<ResponseChartProps> = ({ responseCounts }) => {
 
   return (
     <div className="mt-4 w-[300px] h-full">
-      <h3 className="text-lg text-center">Response Distribution</h3>
       {Object.keys(responseCounts).length > 0 ? (
         <Pie data={pieChartData} />
       ) : (
