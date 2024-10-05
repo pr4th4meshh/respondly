@@ -1,12 +1,12 @@
 "use client";
 import { FormEvent, useState } from "react";
 
-const CreateForm = ({onSuccess, onSubmit}) => {
+const CreateForm = ({ onSuccess, onSubmit }) => {
   const [title, setTitle] = useState("Untitled Form");
-  const [fields, setFields] = useState([{ label: "", type: "text", options: [] }]);
+  const [fields, setFields] = useState([{ label: "", type: "text", options: [], requiredField: false }]);
 
   const handleAddField = () => {
-    setFields((prevFields) => [...prevFields, { label: "", type: "text", options: [] }]);
+    setFields((prevFields) => [...prevFields, { label: "", type: "text", options: [], requiredField: false }]);
   };
 
   const handleFieldChange = (index, key, value) => {
@@ -30,15 +30,15 @@ const CreateForm = ({onSuccess, onSubmit}) => {
     });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     const formattedFormData = {
       title,
-      fields: fields.map(({ label, type, options }) => ({ label, type, options })),
+      fields: fields.map(({ label, type, options, requiredField }) => ({ label, type, options, requiredField })),
     };
-
-    onSubmit(formattedFormData)
+    
+    onSubmit(formattedFormData);
   };
 
   return (
@@ -59,28 +59,40 @@ const CreateForm = ({onSuccess, onSubmit}) => {
         />
 
         {fields.map((field, index) => (
-          <div key={index} className="mb-4">
-            <input
-              type="text"
-              placeholder="Field Label"
-              value={field.label}
-              onChange={(e) => handleFieldChange(index, "label", e.target.value)}
-              required
-              className="w-full rounded-lg bg-gray-800 border-gray-200 p-4 text-sm shadow-sm mb-2"
-            />
-            <select
-              value={field.type}
-              onChange={(e) => handleFieldChange(index, "type", e.target.value)}
-              className="bg-gray-800 p-2 rounded-md text-sm mb-2"
-            >
-              <option value="text">Text</option>
-              <option value="number">Number</option>
-              <option value="email">Email</option>
-              <option value="mcq">Multiple Choice</option>
-              <option value="dropdown">Dropdown</option>
-            </select>
+          <div key={index} className="mb-4 p-4 border border-gray-700 rounded-lg">
+            <div className="flex items-center mb-2">
+              <input
+                type="text"
+                placeholder="Field Label"
+                value={field.label}
+                onChange={(e) => handleFieldChange(index, "label", e.target.value)}
+                required
+                className="flex-grow rounded-lg bg-gray-800 border-gray-200 p-4 text-sm shadow-sm mr-2"
+              />
+              <select
+                value={field.type}
+                onChange={(e) => handleFieldChange(index, "type", e.target.value)}
+                className="bg-gray-800 p-2 rounded-md text-sm"
+              >
+                <option value="text">Text</option>
+                <option value="number">Number</option>
+                <option value="email">Email</option>
+                <option value="mcq">Multiple Choice</option>
+                <option value="dropdown">Dropdown</option>
+              </select>
+            </div>
+            <div className="flex items-center mt-2">
+              <input
+                type="checkbox"
+                id={`required-${index}`}
+                checked={field.requiredField}
+                onChange={(e) => handleFieldChange(index, "requiredField", e.target.checked)}
+                className="mr-2"
+              />
+              <label htmlFor={`required-${index}`} className="text-sm">Required field</label>
+            </div>
             {(field.type === "mcq" || field.type === "dropdown") && (
-              <div className="ml-4">
+              <div className="ml-4 mt-2">
                 {field.options.map((option, optionIndex) => (
                   <input
                     key={optionIndex}

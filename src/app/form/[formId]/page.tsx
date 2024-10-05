@@ -1,69 +1,61 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useForm, Controller } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
+import { useState, useEffect, FormEvent } from "react";
+
+interface IField {
+  label: string
+  type: string
+  options: string[]
+  requiredField: boolean
+}
 
 const FormPage = ({ params }: { params: { formId: string } }) => {
-  const [form, setForm] = useState(null)
-  const [successMessage, setSuccessMessage] = useState("")
+  const [form, setForm] = useState(null);
+  const [formData, setFormData] = useState({});
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (params.formId) {
       fetch(`/api/forms/${params.formId}`)
         .then((response) => response.json())
         .then((data) => {
-          console.log("Fetched form data:", data)
-          setForm(data.data)
+          console.log("Fetched form data:", data);
+          setForm(data.data);
+          // initialize formData with empty strings for each field
+          const initialFormData = {};
+          data.data.fields.forEach((field: IField) => {
+            initialFormData[field.label] = "";
+          });
+          setFormData(initialFormData);
         })
-        .catch((error) => console.error("Error fetching form:", error))
+        .catch((error) => {
+          console.error("Error fetching form:", error);
+          setErrorMessage("Failed to load form. Please try again later.");
+        });
     }
-  }, [params.formId])
+  }, [params.formId]);
 
-  const generateZodSchema = (fields) => {
-    const schemaObject = {}
-    fields.forEach((field) => {
-      switch (field.type) {
-        case "text":
-          schemaObject[field.label] = z.string().min(1, { message: "This field is required" })
-          break
-        case "email":
-          schemaObject[field.label] = z.string().email({ message: "Invalid email address" })
-          break
-        case "number":
-          schemaObject[field.label] = z.number({ invalid_type_error: "Must be a number" }).int({ message: "Must be an integer" })
-          break
-        case "mcq":
-        case "dropdown":
-          schemaObject[field.label] = z.enum(field.options, {
-            errorMap: () => ({ message: "Please select an option" }),
-          })
-          break
-        case "checkbox":
-          schemaObject[field.label] = z.array(z.string()).min(1, { message: "Please select at least one option" })
-          break
-      }
-    })
-    return z.object(schemaObject)
-  }
+  const handleInputChange = (label: string, value: string | string[]) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [label]: value,
+    }));
+  };
 
-  const schema = form ? generateZodSchema(form.fields) : z.object({})
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setErrorMessage("");
+    setSuccessMessage("");
 
-  const {
-    control,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm({
-    resolver: zodResolver(schema),
-  })
-
-  const onSubmit = async (data) => {
-    const formattedResponses = Object.entries(data).map(([label, value]) => ({
-      label,
-      value: Array.isArray(value) ? value.join(", ") : value,
-    }))
+    const formattedResponses = Object.entries(formData)
+      .filter(([_, value]) => value !== "" && value.length !== 0) // Filter out empty responses
+      .map(([label, value]) => ({
+        label,
+        value: Array.isArray(value) ? value.join(", ") : value,
+      }));
 
     try {
       const response = await fetch(`/api/response/${params.formId}`, {
@@ -72,145 +64,138 @@ const FormPage = ({ params }: { params: { formId: string } }) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ responses: formattedResponses }),
-      })
+      });
 
-      const result = await response.json()
+      const result = await response.json();
 
       if (response.ok) {
-        console.log("Formatted Responses:", formattedResponses)
-        setSuccessMessage("Response submitted successfully!")
-        reset()
+        console.log("Formatted Responses:", formattedResponses);
+        setSuccessMessage("Response submitted successfully!");
+        // Reset form data
+        const resetFormData = {};
+        form.fields.forEach((field) => {
+          resetFormData[field.label] = "";
+        });
+        setFormData(resetFormData);
       } else {
-        console.error("Error submitting response:", result.error)
+        console.error("Error submitting response:", result.error);
+        setErrorMessage("Failed to submit response. Please try again.");
       }
     } catch (error) {
-      console.error("Error submitting response:", error)
+      console.error("Error submitting response:", error);
+      setErrorMessage("An unexpected error occurred. Please try again later.");
+    } finally {
+      setIsSubmitting(false);
     }
-  }
+  };
 
-  const handleNumberInput = (onChange) => (e) => {
-    const value = e.target.value
-    if (value === "" || /^[0-9]+$/.test(value)) {
-      onChange(value === "" ? "" : parseInt(value, 10))
-    }
-  }
-
-  if (!form) return <div className="h-screen bg-gray-900">Loading form...</div>
+  if (!form) return (
+    <div className="h-screen bg-gray-900 flex items-center justify-center">
+      <div className="text-white text-xl">
+        {errorMessage || "Loading form..."}
+      </div>
+    </div>
+  );
 
   return (
-    <div className="h-screen bg-gray-900">
-      <div className="container mx-auto py-16 px-2 sm:px-0">
-        <div className="mx-auto max-w-lg border border-gray-800 p-8 rounded-lg">
-          <h1 className="text-blue-300 text-3xl text-center">{form.title}</h1>
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="mb-0 mt-6 space-y-4 rounded-lg p-4 sm:p-6 lg:p-8 text-gray-300"
-          >
-            {form.fields.map((field, index) => (
-              <div key={index}>
-                <label>
-                  {field.label.charAt(0).toUpperCase() + field.label.slice(1)}
-                  <span className="text-red-500 ml-0.5">*</span>
-                </label>
+    <div className="min-h-screen bg-gray-900 py-12">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-lg mx-auto bg-gray-800 shadow-lg rounded-lg overflow-hidden">
+          <div className="px-6 py-8">
+            <h1 className="text-blue-300 text-3xl font-bold text-center mb-6">{form.title}</h1>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {form.fields.map((field, index) => (
+                <div key={index} className="space-y-2">
+                  <label className="flex text-sm font-medium text-gray-300">
+                    {field.requiredField ? ( <h1 className="text-red-500 pr-1">*</h1> ) : ""} {field.label.charAt(0).toUpperCase() + field.label.slice(1)}
+                  </label>
 
-                <Controller
-                  name={field.label}
-                  control={control}
-                  defaultValue=""
-                  render={({ field: { onChange, value } }) => (
-                    <>
-                      {["text", "email"].includes(field.type) && (
-                        <input
-                          type={field.type}
-                          value={value}
-                          onChange={onChange}
-                          className="w-full rounded-lg bg-gray-800 border-gray-200 p-4 pe-12 text-sm shadow-sm mt-1 mb-2"
-                          placeholder="Your response..."
-                        />
-                      )}
-                      {field.type === "number" && (
-                        <input
-                          type="text"
-                          inputMode="numeric"
-                          pattern="[0-9]*"
-                          value={value}
-                          onChange={handleNumberInput(onChange)}
-                          className="w-full rounded-lg bg-gray-800 border-gray-200 p-4 pe-12 text-sm shadow-sm mt-1 mb-2"
-                          placeholder="Enter a number..."
-                        />
-                      )}
-                      {field.type === "mcq" &&
-                        field.options?.length > 0 &&
-                        field.options.map((option, optionIndex) => (
-                          <div key={optionIndex}>
-                            <input
-                              type="radio"
-                              id={`${field.label}-${optionIndex}`}
-                              value={option}
-                              checked={value === option}
-                              onChange={() => onChange(option)}
-                              className="mr-2"
-                            />
-                            <label htmlFor={`${field.label}-${optionIndex}`}>{option}</label>
-                          </div>
-                        ))}
-                      {field.type === "checkbox" &&
-                        field.options?.length > 0 &&
-                        field.options.map((option, optionIndex) => (
-                          <div key={optionIndex}>
-                            <input
-                              type="checkbox"
-                              id={`${field.label}-${optionIndex}`}
-                              value={option}
-                              checked={(value || []).includes(option)}
-                              onChange={(e) => {
-                                const newValue = e.target.checked
-                                  ? [...(value || []), option]
-                                  : (value || []).filter((v) => v !== option)
-                                onChange(newValue)
-                              }}
-                              className="mr-2"
-                            />
-                            <label htmlFor={`${field.label}-${optionIndex}`}>{option}</label>
-                          </div>
-                        ))}
-                      {field.type === "dropdown" && (
-                        <select
-                          value={value}
-                          onChange={onChange}
-                          className="w-full rounded-lg bg-gray-800 border-gray-200 p-4 pe-12 text-sm shadow-sm mt-1 mb-2"
-                        >
-                          <option value="" disabled>
-                            Select an option
-                          </option>
-                          {field.options?.length > 0 &&
-                            field.options.map((option, optionIndex) => (
-                              <option key={optionIndex} value={option}>
-                                {option}
-                              </option>
-                            ))}
-                        </select>
-                      )}
-                    </>
+                  {["text", "email", "number"].includes(field.type) && (
+                    <input
+                      type={field.type}
+                      value={formData[field.label] || ""}
+                      onChange={(e) => handleInputChange(field.label, e.target.value)}
+                      className="w-full rounded-md bg-gray-700 border-gray-600 text-white px-4 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                      placeholder={"Your response.."}
+                      required={field.requiredField}
+                    />
                   )}
-                />
-                {errors[field.label] && (
-                  <p className="text-red-500 text-sm mt-1">{errors[field.label].message}</p>
-                )}
-              </div>
-            ))}
-            <button
-              type="submit"
-              className="block w-full rounded-lg bg-blue-600 px-5 py-3 text-sm font-medium text-white"
-            >
-              Submit Response
-            </button>
-          </form>
-          {successMessage && <p className="text-lg text-center text-green-300">{successMessage}</p>}
+                  {field.type === "mcq" && (
+                    <div>
+                      {field.options?.map((option, optionIndex) => (
+                        <div key={optionIndex} className="flex items-center">
+                          <input
+                            type="radio"
+                            id={`${field.label}-${optionIndex}`}
+                            name={field.label}
+                            value={option}
+                            checked={formData[field.label] === option}
+                            onChange={(e) => handleInputChange(field.label, e.target.value)}
+                            className="mr-2 text-blue-600 focus:ring-blue-500"
+                      required={field.requiredField}
+
+                          />
+                          <label htmlFor={`${field.label}-${optionIndex}`} className="text-sm text-gray-300">{option}</label>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {field.type === "checkbox" && (
+                    <div>
+                      {field.options?.map((option, optionIndex) => (
+                        <div key={optionIndex} className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id={`${field.label}-${optionIndex}`}
+                            value={option}
+                            checked={(formData[field.label] || []).includes(option)}
+                            onChange={(e) => {
+                              const currentValues = formData[field.label] || [];
+                              const newValues = e.target.checked
+                                ? [...currentValues, option]
+                                : currentValues.filter((v) => v !== option);
+                              handleInputChange(field.label, newValues);
+                            }}
+                            className="mr-2 text-blue-600 focus:ring-blue-500"
+                      required={field.requiredField}
+
+                          />
+                          <label htmlFor={`${field.label}-${optionIndex}`} className="text-sm text-gray-300">{option}</label>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {field.type === "dropdown" && (
+                    <select
+                      value={formData[field.label] || ""}
+                      onChange={(e) => handleInputChange(field.label, e.target.value)}
+                      className="w-full rounded-md bg-gray-700 border-gray-600 text-white px-4 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="">Optional - Select an option</option>
+                      {field.options?.map((option, optionIndex) => (
+                        <option key={optionIndex} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+              ))}
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full bg-blue-600 text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              >
+                {isSubmitting ? "Submitting..." : "Submit Response"}
+              </button>
+            </form>
+            {successMessage && <p className="mt-4 text-center text-green-400">{successMessage}</p>}
+            {errorMessage && <p className="mt-4 text-center text-red-400">{errorMessage}</p>}
+          </div>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default FormPage;
