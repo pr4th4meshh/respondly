@@ -170,6 +170,7 @@ const FormPage = ({ params }: { params: { formId: string } }) => {
                       value={formData[field.label] || ""}
                       onChange={(e) => handleInputChange(field.label, e.target.value)}
                       className="w-full rounded-md bg-gray-700 border-gray-600 text-white px-4 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                      required={field.requiredField}
                     >
                       <option value="">Optional - Select an option</option>
                       {field.options?.map((option, optionIndex) => (
