@@ -10,29 +10,34 @@ interface IProfileForm {
     email: string
     profilePhoto: string
   }
-  onSubmit: (value: string) => void
+  onSubmit: (value: {
+    username: string
+    email: string
+    password: string
+    profilePhoto: string
+  }) => void
 }
 
 const ProfileForm = ({ user, onSubmit }: IProfileForm) => {
-  const [username, setUsername] = useState(user?.name || "");
-  const [password, setPassword] = useState("");
-  const [email, setEmail] = useState(user?.email || "");
-  const [profilePhoto, setProfilePhoto] = useState(user?.profilePhoto || "");
-  const { update } = useSession();
+  const [username, setUsername] = useState(user?.name || "")
+  const [password, setPassword] = useState("")
+  const [email, setEmail] = useState(user?.email || "")
+  const [profilePhoto, setProfilePhoto] = useState(user?.profilePhoto || "")
+  const { update } = useSession()
 
   const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
 
     // Call onSubmit prop with updated user data
-    onSubmit({ username, email, password, profilePhoto });
+    onSubmit({ username, email, password, profilePhoto })
     try {
       // Refresh session to get the latest user data
-      await update();
-      console.log("Session updated successfully.");
+      await update()
+      console.log("Session updated successfully.")
     } catch (error) {
-      console.error("Failed to update session:", error);
+      console.error("Failed to update session:", error)
     }
-  };
+  }
 
   return (
     <div className="mr-10 border border-gray-800 p-2 sm:p-8 rounded-lg">

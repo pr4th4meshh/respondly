@@ -1,31 +1,40 @@
-import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
+import { useEffect, useState } from "react"
+import { useRouter } from "next/router"
+
+interface IResponse {
+  label: string
+  value: string | number | boolean | null
+}
+
+interface IResponsesData {
+  responses: IResponse[]
+}
 
 const FormResponsesPage = () => {
-  const router = useRouter();
-  const { formId } = router.query; // Get formId from the URL
-  const [responses, setResponses] = useState([]);
+  const router = useRouter()
+  const { formId } = router.query
+  const [responses, setResponses] = useState<IResponsesData[]>([])
 
   useEffect(() => {
     const fetchResponses = async () => {
-      if (!formId) return;
+      if (!formId) return
 
       try {
-        const response = await fetch(`/api/responses/${formId}`);
-        const data = await response.json();
+        const response = await fetch(`/api/responses/${formId}`)
+        const data = await response.json()
 
         if (response.ok) {
-          setResponses(data.data);
+          setResponses(data.data)
         } else {
-          console.error("Failed to fetch responses:", data.error);
+          console.error("Failed to fetch responses:", data.error)
         }
       } catch (error) {
-        console.error("Error fetching responses:", error);
+        console.error("Error fetching responses:", error)
       }
-    };
+    }
 
-    fetchResponses();
-  }, [formId]);
+    fetchResponses()
+  }, [formId])
 
   return (
     <div>
@@ -41,7 +50,7 @@ const FormResponsesPage = () => {
         </div>
       ))}
     </div>
-  );
-};
+  )
+}
 
-export default FormResponsesPage;
+export default FormResponsesPage

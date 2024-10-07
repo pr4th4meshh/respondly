@@ -20,22 +20,28 @@ interface FormData {
   _id: string
   title: string
   fields: FormField[]
-  responses: FormResponse[]
 }
 
-const ResponsePage: React.FC = ({ params }) => {
+interface ApiResponse {
+  data: FormResponse[]
+}
+
+const ResponsePage: React.FC<{ params: { formId: string } }> = ({ params }) => {
   const formId = params.formId
-  const [formData, setFormData] = useState<FormData | null>(null)
+  const [formData, setFormData] = useState<ApiResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [form, setForm] = useState(null)
+  const [form, setForm] = useState<FormData | null>(null)
 
   useEffect(() => {
     if (formId) {
       fetch(`/api/forms/${formId}`)
         .then((response) => response.json())
         .then((data) => setForm(data.data))
-        .catch((error) => console.error("Error fetching form:", error))
+        .catch((error) => {
+          console.error("Error fetching form:", error)
+          setError("Failed to fetch form.")
+        })
     }
   }, [formId])
 
@@ -82,7 +88,6 @@ const ResponsePage: React.FC = ({ params }) => {
       </div>
     )
 
-  // show message if there are no responses
   if (formData?.data.length === 0)
     return (
       <div className="h-[90vh] bg-gray-900 text-white flex justify-center items-center text-center">
@@ -97,46 +102,28 @@ const ResponsePage: React.FC = ({ params }) => {
           {form?.title} Responses
         </h1>
 
-        {/* display responses for each field */}
         {form?.fields.map((field, index) => {
-          console.log(form, "FORMFIELDS")
-          const responseCounts: Record<string, number> = {} // COUNT RESPONSES (CHARTS)
-          const textResponses: string[] = [] // TEXT RESPONSES
+          const responseCounts: Record<string, number> = {}
+          const textResponses: string[] = []
 
-          // count responses based on field type
-          formData.data.forEach((response) => {
-            const value = response.value as string // transform to string
+          formData?.data.forEach((response) => {
+            const value = String(response.value)
             if (response.label === field.label) {
-              if (
-                field.type === "text" ||
-                field.type === "number" ||
-                field.type === "email"
-              ) {
-                textResponses.push(String(value)) // count text response
-                console.log(textResponses)
+              if (["text", "number", "email"].includes(field.type)) {
+                textResponses.push(value)
               } else if (field.options?.includes(value)) {
-                responseCounts[value] = (responseCounts[value] || 0) + 1 // count multiple-choice responses
-
-                // responseCounts[value] = (responseCounts[value] || 0)
-                // means if there is response count or the count of response value is 0
+                responseCounts[value] = (responseCounts[value] || 0) + 1
               }
             }
           })
 
           return (
-            <div
-              key={index}
-              className="mb-8 p-4 bg-gray-800 rounded-md shadow-lg"
-            >
+            <div key={index} className="mb-8 p-4 bg-gray-800 rounded-md shadow-lg">
               <h2 className="text-2xl font-semibold text-blue-200">
-                {index + 1}.{" "}
-                {field.label.charAt(0).toUpperCase() + field.label.slice(1)}
+                {index + 1}. {field.label.charAt(0).toUpperCase() + field.label.slice(1)}
               </h2>
 
-              {/* displaying text responses */}
-              {field.type === "text" ||
-              field.type === "email" ||
-              field.type === "number" ? (
+              {["text", "email", "number"].includes(field.type) ? (
                 <ul className="ml-4 mt-2 list-disc list-inside">
                   {textResponses.map((response, i) => (
                     <li key={i} className="text-lg">
@@ -145,7 +132,6 @@ const ResponsePage: React.FC = ({ params }) => {
                   ))}
                 </ul>
               ) : (
-                // displaying count responses in chart
                 <ResponseChart responseCounts={responseCounts} />
               )}
             </div>

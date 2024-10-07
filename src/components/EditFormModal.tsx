@@ -52,39 +52,9 @@ const EditFormModal = ({
 
   // Remove a field
   const handleRemoveField = (index: number) => {
-    const updatedFields = fields.filter((_, i) => i !== index);
+    const updatedFields = fields.filter((_: any, i: number) => i !== index);
     setFields(updatedFields);
   };
-
-  // Handle form submit
-  // const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  //   e.preventDefault();
-
-  //   try {
-  //     const response = await fetch(`/api/forms/${form._id}`, {
-  //       method: "PUT",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({ title: formTitle, fields }),
-  //     });
-
-  //     if (response.ok) {
-  //       const result = await response.json();
-  //       setShowMessagePopup(true);
-  //       setPopupMessage("Form updated successfully!");
-  //       setMessagePopupType("success");
-  //       onConfirm(); // Close the modal or refresh data
-  //     } else {
-  //       const errorData = await response.json();
-  //       console.error("Failed to update form:", errorData.error);
-  //       alert("Failed to update form.");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error updating form:", error);
-  //     alert("Error updating form.");
-  //   }
-  // };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

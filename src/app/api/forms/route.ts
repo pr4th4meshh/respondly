@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
       { success: true, data: form, link: `/forms/${form._id}` },
       { status: 201 }
     )
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error saving form:", error.message)
     return NextResponse.json(
       { success: false, error: error.message },
@@ -111,7 +111,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ success: true, data: forms }, { status: 200 })
     // return data to user frontend
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json(
       { success: false, error: error.message },
       { status: 400 }
@@ -156,7 +156,7 @@ export async function DELETE(req: NextRequest) {
       { status: 200 }
     )
     // return 200 for success deletion
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json(
       { success: false, error: error.message },
       { status: 400 }

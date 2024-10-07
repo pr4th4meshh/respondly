@@ -24,7 +24,7 @@ export async function POST(req: NextRequest, { params }: { params: { formId: str
 
     // Validate each response
     const invalidResponse = responses.some(response => {
-      const formField = form.fields.find(f => f.label === response.label);
+      const formField = form.fields.find((f: { label: any }) => f.label === response.label);
 
       if (!formField) {
         return true; // Field does not exist
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest, { params }: { params: { formId: str
     await form.save();
 
     return NextResponse.json({ success: true, data: form.responses }, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 400 });
   }
 }
@@ -72,7 +72,7 @@ export async function GET(req: NextRequest, { params }: { params: { formId: stri
     }
 
     return NextResponse.json({ success: true, data: form.responses }, { status: 200 });
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 400 });
   }
 }

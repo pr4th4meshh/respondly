@@ -3,15 +3,24 @@
 import { useState, useEffect, FormEvent } from "react";
 
 interface IField {
-  label: string
-  type: string
-  options: string[]
-  requiredField: boolean
+  label: string;
+  type: string;
+  options?: string[];
+  requiredField: boolean;
+}
+
+interface IForm {
+  title: string;
+  fields: IField[];
+}
+
+interface IFormResponse {
+  data: IForm;
 }
 
 const FormPage = ({ params }: { params: { formId: string } }) => {
-  const [form, setForm] = useState(null);
-  const [formData, setFormData] = useState({});
+  const [form, setForm] = useState<IForm | null>(null);
+  const [formData, setFormData] = useState<Record<string, string | string[]>>({});
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -20,12 +29,13 @@ const FormPage = ({ params }: { params: { formId: string } }) => {
     if (params.formId) {
       fetch(`/api/forms/${params.formId}`)
         .then((response) => response.json())
-        .then((data) => {
+        .then((data: IFormResponse) => {
           console.log("Fetched form data:", data);
           setForm(data.data);
-          // initialize formData with empty strings for each field
-          const initialFormData = {};
-          data.data.fields.forEach((field: IField) => {
+
+          // Initialize formData with empty strings for each field
+          const initialFormData: Record<string, string> = {};
+          data.data.fields.forEach((field) => {
             initialFormData[field.label] = "";
           });
           setFormData(initialFormData);
@@ -72,8 +82,8 @@ const FormPage = ({ params }: { params: { formId: string } }) => {
         console.log("Formatted Responses:", formattedResponses);
         setSuccessMessage("Response submitted successfully!");
         // Reset form data
-        const resetFormData = {};
-        form.fields.forEach((field) => {
+        const resetFormData: Record<string, string> = {};
+        form?.fields.forEach((field) => {
           resetFormData[field.label] = "";
         });
         setFormData(resetFormData);
@@ -89,37 +99,49 @@ const FormPage = ({ params }: { params: { formId: string } }) => {
     }
   };
 
-  if (!form) return (
-    <div className="h-screen bg-gray-900 flex items-center justify-center">
-      <div className="text-white text-xl">
-        {errorMessage || "Loading form..."}
+  if (!form) {
+    return (
+      <div className="h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-white text-xl">
+          {errorMessage || "Loading form..."}
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-900 py-12">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-lg mx-auto bg-gray-800 shadow-lg rounded-lg overflow-hidden">
           <div className="px-6 py-8">
-            <h1 className="text-blue-300 text-3xl font-bold text-center mb-6">{form.title}</h1>
+            <h1 className="text-blue-300 text-3xl font-bold text-center mb-6">
+              {form.title}
+            </h1>
             <form onSubmit={handleSubmit} className="space-y-6">
               {form.fields.map((field, index) => (
                 <div key={index} className="space-y-2">
                   <label className="flex text-sm font-medium text-gray-300">
-                    {field.requiredField ? ( <h1 className="text-red-500 pr-1">*</h1> ) : ""} {field.label.charAt(0).toUpperCase() + field.label.slice(1)}
+                    {field.requiredField ? (
+                      <span className="text-red-500 pr-1">*</span>
+                    ) : (
+                      ""
+                    )}
+                    {field.label.charAt(0).toUpperCase() + field.label.slice(1)}
                   </label>
 
                   {["text", "email", "number"].includes(field.type) && (
                     <input
                       type={field.type}
                       value={formData[field.label] || ""}
-                      onChange={(e) => handleInputChange(field.label, e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange(field.label, e.target.value)
+                      }
                       className="w-full rounded-md bg-gray-700 border-gray-600 text-white px-4 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
                       placeholder={"Your response.."}
                       required={field.requiredField}
                     />
                   )}
+
                   {field.type === "mcq" && (
                     <div>
                       {field.options?.map((option, optionIndex) => (
@@ -130,16 +152,23 @@ const FormPage = ({ params }: { params: { formId: string } }) => {
                             name={field.label}
                             value={option}
                             checked={formData[field.label] === option}
-                            onChange={(e) => handleInputChange(field.label, e.target.value)}
+                            onChange={(e) =>
+                              handleInputChange(field.label, e.target.value)
+                            }
                             className="mr-2 text-blue-600 focus:ring-blue-500"
-                      required={field.requiredField}
-
+                            required={field.requiredField}
                           />
-                          <label htmlFor={`${field.label}-${optionIndex}`} className="text-sm text-gray-300">{option}</label>
+                          <label
+                            htmlFor={`${field.label}-${optionIndex}`}
+                            className="text-sm text-gray-300"
+                          >
+                            {option}
+                          </label>
                         </div>
                       ))}
                     </div>
                   )}
+
                   {field.type === "checkbox" && (
                     <div>
                       {field.options?.map((option, optionIndex) => (
@@ -148,31 +177,41 @@ const FormPage = ({ params }: { params: { formId: string } }) => {
                             type="checkbox"
                             id={`${field.label}-${optionIndex}`}
                             value={option}
-                            checked={(formData[field.label] || []).includes(option)}
+                            checked={(formData[field.label] || []).includes(
+                              option
+                            )}
                             onChange={(e) => {
-                              const currentValues = formData[field.label] || [];
+                              const currentValues =
+                                (formData[field.label] as string[]) || [];
                               const newValues = e.target.checked
                                 ? [...currentValues, option]
                                 : currentValues.filter((v) => v !== option);
                               handleInputChange(field.label, newValues);
                             }}
                             className="mr-2 text-blue-600 focus:ring-blue-500"
-                      required={field.requiredField}
-
+                            required={field.requiredField}
                           />
-                          <label htmlFor={`${field.label}-${optionIndex}`} className="text-sm text-gray-300">{option}</label>
+                          <label
+                            htmlFor={`${field.label}-${optionIndex}`}
+                            className="text-sm text-gray-300"
+                          >
+                            {option}
+                          </label>
                         </div>
                       ))}
                     </div>
                   )}
+
                   {field.type === "dropdown" && (
                     <select
                       value={formData[field.label] || ""}
-                      onChange={(e) => handleInputChange(field.label, e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange(field.label, e.target.value)
+                      }
                       className="w-full rounded-md bg-gray-700 border-gray-600 text-white px-4 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
                       required={field.requiredField}
                     >
-                      <option value="">Optional - Select an option</option>
+                      <option value="">Select an option</option>
                       {field.options?.map((option, optionIndex) => (
                         <option key={optionIndex} value={option}>
                           {option}
@@ -190,8 +229,14 @@ const FormPage = ({ params }: { params: { formId: string } }) => {
                 {isSubmitting ? "Submitting..." : "Submit Response"}
               </button>
             </form>
-            {successMessage && <p className="mt-4 text-center text-green-400">{successMessage}</p>}
-            {errorMessage && <p className="mt-4 text-center text-red-400">{errorMessage}</p>}
+            {successMessage && (
+              <p className="mt-4 text-center text-green-400">
+                {successMessage}
+              </p>
+            )}
+            {errorMessage && (
+              <p className="mt-4 text-center text-red-400">{errorMessage}</p>
+            )}
           </div>
         </div>
       </div>
