@@ -9,6 +9,7 @@ import { IoAddCircleOutline } from "react-icons/io5"
 import EditFormModal from "@/components/EditFormModal"
 import ProfileForm from "./_components/ProfileForm"
 import Popup from "@/components/Popup"
+import { ThreeDots } from "react-loader-spinner"
 
 interface IForm {
   _id: string
@@ -212,9 +213,18 @@ const ProfilePage = () => {
                 </Link>
               </div>
               {loading ? (
-                <p className="text-center text-lg text-gray-400">
-                  Loading forms...
-                </p>
+                <div className="flex justify-center items-center">
+                  <ThreeDots
+                    visible={true}
+                    height="70"
+                    width="70"
+                    color="#3b82f6"
+                    radius="1"
+                    ariaLabel="three-dots-loading"
+                    wrapperStyle={{}}
+                    wrapperClass=""
+                  />
+                </div>
               ) : forms.length > 0 ? (
                 <ul className="space-y-4">
                   {forms.map((form) => (

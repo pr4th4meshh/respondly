@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react"
 import axios from "axios"
 import { AiOutlineLoading3Quarters } from "react-icons/ai"
 import ResponseChart from "../_components/ResponseChart"
+import Loading from "../../../components/loading"
 
 interface FormField {
   label: string
@@ -62,16 +63,7 @@ const ResponsePage: React.FC<{ params: { formId: string } }> = ({ params }) => {
     fetchFormData()
   }, [formId])
 
-  if (loading)
-    return (
-      <div className="h-[90vh] bg-gray-900 text-white flex justify-center items-center text-center">
-        <AiOutlineLoading3Quarters
-          aria-label="Loading.."
-          className="animate-spin text-4xl"
-        />
-        <span className="ml-4 text-2xl">Loading, please wait...</span>
-      </div>
-    )
+  if (loading) return <Loading />
 
   if (error)
     return (
@@ -118,9 +110,13 @@ const ResponsePage: React.FC<{ params: { formId: string } }> = ({ params }) => {
           })
 
           return (
-            <div key={index} className="mb-8 p-4 bg-gray-800 rounded-md shadow-lg">
+            <div
+              key={index}
+              className="mb-8 p-4 bg-gray-800 rounded-md shadow-lg"
+            >
               <h2 className="text-2xl font-semibold text-blue-200">
-                {index + 1}. {field.label.charAt(0).toUpperCase() + field.label.slice(1)}
+                {index + 1}.{" "}
+                {field.label.charAt(0).toUpperCase() + field.label.slice(1)}
               </h2>
 
               {["text", "email", "number"].includes(field.type) ? (

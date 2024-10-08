@@ -1,71 +1,76 @@
-"use client";
+"use client"
 
-import { useState, useEffect, FormEvent } from "react";
+import Loading from "@/components/loading"
+import { useState, useEffect, FormEvent } from "react"
 
 interface IField {
-  label: string;
-  type: string;
-  options?: string[];
-  requiredField: boolean;
+  label: string
+  type: string
+  options?: string[]
+  requiredField: boolean
 }
 
 interface IForm {
-  title: string;
-  fields: IField[];
+  title: string
+  fields: IField[]
 }
 
 interface IFormResponse {
-  data: IForm;
+  data: IForm
 }
 
 const FormPage = ({ params }: { params: { formId: string } }) => {
-  const [form, setForm] = useState<IForm | null>(null);
-  const [formData, setFormData] = useState<Record<string, string | string[]>>({});
-  const [successMessage, setSuccessMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [form, setForm] = useState<IForm | null>(null)
+  const [formData, setFormData] = useState<Record<string, string | string[]>>(
+    {}
+  )
+  const [successMessage, setSuccessMessage] = useState("")
+  const [errorMessage, setErrorMessage] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     if (params.formId) {
       fetch(`/api/forms/${params.formId}`)
         .then((response) => response.json())
         .then((data: IFormResponse) => {
-          console.log("Fetched form data:", data);
-          setForm(data.data);
+          console.log("Fetched form data:", data)
+          setForm(data.data)
 
           // Initialize formData with empty strings for each field
-          const initialFormData: Record<string, string> = {};
+          const initialFormData: Record<string, string> = {}
           data.data.fields.forEach((field) => {
-            initialFormData[field.label] = "";
-          });
-          setFormData(initialFormData);
+            initialFormData[field.label] = ""
+          })
+          setFormData(initialFormData)
+          setLoading(false)
         })
         .catch((error) => {
-          console.error("Error fetching form:", error);
-          setErrorMessage("Failed to load form. Please try again later.");
-        });
+          console.error("Error fetching form:", error)
+          setErrorMessage("Failed to load form. Please try again later.")
+        })
     }
-  }, [params.formId]);
+  }, [params.formId])
 
   const handleInputChange = (label: string, value: string | string[]) => {
     setFormData((prevData) => ({
       ...prevData,
       [label]: value,
-    }));
-  };
+    }))
+  }
 
   const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setErrorMessage("");
-    setSuccessMessage("");
+    e.preventDefault()
+    setIsSubmitting(true)
+    setErrorMessage("")
+    setSuccessMessage("")
 
     const formattedResponses = Object.entries(formData)
       .filter(([_, value]) => value !== "" && value.length !== 0) // Filter out empty responses
       .map(([label, value]) => ({
         label,
         value: Array.isArray(value) ? value.join(", ") : value,
-      }));
+      }))
 
     try {
       const response = await fetch(`/api/response/${params.formId}`, {
@@ -74,39 +79,41 @@ const FormPage = ({ params }: { params: { formId: string } }) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ responses: formattedResponses }),
-      });
+      })
 
-      const result = await response.json();
+      const result = await response.json()
 
       if (response.ok) {
-        console.log("Formatted Responses:", formattedResponses);
-        setSuccessMessage("Response submitted successfully!");
+        console.log("Formatted Responses:", formattedResponses)
+        setSuccessMessage("Response submitted successfully!")
         // Reset form data
-        const resetFormData: Record<string, string> = {};
+        const resetFormData: Record<string, string> = {}
         form?.fields.forEach((field) => {
-          resetFormData[field.label] = "";
-        });
-        setFormData(resetFormData);
+          resetFormData[field.label] = ""
+        })
+        setFormData(resetFormData)
       } else {
-        console.error("Error submitting response:", result.error);
-        setErrorMessage("Failed to submit response. Please try again.");
+        console.error("Error submitting response:", result.error)
+        setErrorMessage("Failed to submit response. Please try again.")
       }
     } catch (error) {
-      console.error("Error submitting response:", error);
-      setErrorMessage("An unexpected error occurred. Please try again later.");
+      console.error("Error submitting response:", error)
+      setErrorMessage("An unexpected error occurred. Please try again later.")
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
+
+  if (loading) {
+    return <Loading />
+  }
 
   if (!form) {
     return (
       <div className="h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-white text-xl">
-          {errorMessage || "Loading form..."}
-        </div>
+        <div className="text-white text-xl">{errorMessage}</div>
       </div>
-    );
+    )
   }
 
   return (
@@ -182,11 +189,11 @@ const FormPage = ({ params }: { params: { formId: string } }) => {
                             )}
                             onChange={(e) => {
                               const currentValues =
-                                (formData[field.label] as string[]) || [];
+                                (formData[field.label] as string[]) || []
                               const newValues = e.target.checked
                                 ? [...currentValues, option]
-                                : currentValues.filter((v) => v !== option);
-                              handleInputChange(field.label, newValues);
+                                : currentValues.filter((v) => v !== option)
+                              handleInputChange(field.label, newValues)
                             }}
                             className="mr-2 text-blue-600 focus:ring-blue-500"
                             required={field.requiredField}
@@ -241,7 +248,7 @@ const FormPage = ({ params }: { params: { formId: string } }) => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default FormPage;
+export default FormPage

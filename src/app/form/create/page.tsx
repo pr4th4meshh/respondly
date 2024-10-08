@@ -1,6 +1,7 @@
 "use client"
 
 import CreateForm from "@/components/CreateForm"
+import Loading from "@/components/loading"
 import Popup from "@/components/Popup"
 import { IForm } from "@/models/Form"
 import React, { useEffect, useState } from "react"
@@ -45,6 +46,10 @@ const CreateNewForm = () => {
   useEffect(() => {
     fetchForms()
   }, [])
+
+  if (loading) {
+    return <Loading />
+  }
 
   const handleCreateForm = async (newFormData: IForm) => {
     try {
