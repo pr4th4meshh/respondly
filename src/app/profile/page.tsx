@@ -201,6 +201,8 @@ const ProfilePage = () => {
                 <ProfileForm onSubmit={handleEditUser} user={session?.user} />
               )}
             </div>
+
+            {/* FORMS INFORMATION */}
             <div className="sm:w-1/2 bg-gray-800 p-8 rounded-lg">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl text-blue-300">Your Forms:</h2>
@@ -239,18 +241,18 @@ const ProfilePage = () => {
                             : form.title}
                         </h3>
                       </Link>
-                      <div className="flex">
+                      <div className="flex sm:flex-row flex-col sm:gap-0 gap-3">
                         <Link href={`/responses/${form._id}`}>
                           <ButtonComponent
                             buttonBg="bg-green-600"
                             buttonTitle="View Responses"
-                            className="mr-2"
+                            className="sm:mr-2"
                           />
                         </Link>
                         <ButtonComponent
                           buttonBg="bg-blue-600"
                           buttonTitle="Edit"
-                          className="mr-2"
+                          className="sm:mr-2"
                           onClick={() => handleShowEditFormModal(form)}
                         />
                         <ButtonComponent

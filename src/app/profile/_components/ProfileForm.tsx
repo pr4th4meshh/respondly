@@ -40,7 +40,7 @@ const ProfileForm = ({ user, onSubmit }: IProfileForm) => {
   }
 
   return (
-    <div className="mr-10 border border-gray-800 p-2 sm:p-8 rounded-lg">
+    <div className="mr-0 sm:mr-10 border border-gray-800 p-2 sm:p-8 rounded-lg">
       <h1 className="text-center text-3xl font-bold text-blue-300 sm:text-3xl">
         Edit Profile:
       </h1>
