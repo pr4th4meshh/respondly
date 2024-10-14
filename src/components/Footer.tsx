@@ -4,7 +4,7 @@ import React from "react"
 const Footer = () => {
   const currentYear = new Date().getFullYear()
   return (
-    <footer className="bg-gray-100 dark:bg-gray-900">
+    <footer className="bg-gray-900">
       <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="flex justify-center text-blue-600 dark:text-blue-300">
           <span className="bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 bg-clip-text text-3xl font-extrabold text-transparent sm:text-5xl">

@@ -20,7 +20,7 @@ const Navbar = () => {
   }
   return (
     <>
-      <header className="bg-white dark:bg-gray-900 border-b border-b-gray-700">
+      <header className="bg-gray-900 border-b border-b-gray-700">
         <div className="mx-auto flex h-16 max-w-screen-xl items-center gap-8 px-4 sm:px-6 lg:px-8">
           <Link className="block text-blue-600 dark:text-blue-300" href="/">
             <span className="bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 bg-clip-text text-2xl font-extrabold text-transparent sm:text-3xl">
