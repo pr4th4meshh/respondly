@@ -70,7 +70,7 @@ export default function Login() {
                 features.
               </p>
 
-              {error && <div className="">{error}</div>}
+              {error && <div className="text-blue-300 text-lg pt-4">{error}</div>}
 
               <form
                 onSubmit={handleSubmit}
