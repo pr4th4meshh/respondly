@@ -43,7 +43,7 @@ const ProfileForm = ({ user, onSubmit }: IProfileForm) => {
   }
 
   return (
-    <div className="max-w-md mx-auto bg-gray-900 rounded-xl shadow-md overflow-hidden md:max-w-2xl">
+    <div className="max-w-md mx-auto bg-gray-900 border border-gray-700 rounded-xl shadow-md overflow-hidden md:max-w-2xl">
       <div className="md:flex">
         <div className="p-8 w-full">
           <div className="flex justify-between items-center mb-6">

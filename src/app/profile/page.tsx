@@ -10,6 +10,7 @@ import EditFormModal from "@/components/EditFormModal"
 import ProfileForm from "./_components/ProfileForm"
 import Popup from "@/components/Popup"
 import { ThreeDots } from "react-loader-spinner"
+import { BiSearch } from "react-icons/bi"
 
 interface IForm {
   _id: string
@@ -30,6 +31,8 @@ const ProfilePage = () => {
   const [showPopup, setShowPopup] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
   const [selectedForm, setSelectedForm] = useState<IForm | null>(null)
+  const [searchTerm, setSearchTerm] = useState<string>("")
+
   const { data: session, update } = useSession()
 
   // Toast Message States
@@ -178,6 +181,10 @@ const ProfilePage = () => {
     )
   }
 
+  const filteredForms = forms.filter((form) =>
+    form.title.toLowerCase().includes(searchTerm?.toLowerCase())
+  )
+
   return (
     <div className="bg-gray-900 min-h-screen text-white">
       <div className="container mx-auto">
@@ -214,6 +221,17 @@ const ProfilePage = () => {
                   />
                 </Link>
               </div>
+              <div className="flex pb-3">
+                <input
+                  type="text"
+                  className="w-full rounded-lg bg-gray-700 p-4 border-gray-200 text-sm shadow-sm"
+                  placeholder="Search form.."
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <button className="bg-orange-500 flex p-3 items-center rounded-md ml-2">
+                  <BiSearch className="text-xl" /> Search
+                </button>
+              </div>
               {loading ? (
                 <div className="flex justify-center items-center">
                   <ThreeDots
@@ -223,13 +241,11 @@ const ProfilePage = () => {
                     color="#3b82f6"
                     radius="1"
                     ariaLabel="three-dots-loading"
-                    wrapperStyle={{}}
-                    wrapperClass=""
                   />
                 </div>
-              ) : forms.length > 0 ? (
+              ) : filteredForms.length > 0 ? (
                 <ul className="space-y-4">
-                  {forms.map((form) => (
+                  {filteredForms.map((form) => (
                     <li
                       key={form._id}
                       className="bg-gray-700 p-4 rounded-lg flex justify-between items-center"
