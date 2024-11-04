@@ -1,4 +1,5 @@
-"use client"
+'use client'
+
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import axios from "axios"
@@ -10,6 +11,7 @@ import EditFormModal from "@/components/EditFormModal"
 import ProfileForm from "./_components/ProfileForm"
 import Popup from "@/components/Popup"
 import { ThreeDots } from "react-loader-spinner"
+import { BiSearch } from "react-icons/bi"
 
 interface IForm {
   _id: string
@@ -30,6 +32,9 @@ const ProfilePage = () => {
   const [showPopup, setShowPopup] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
   const [selectedForm, setSelectedForm] = useState<IForm | null>(null)
+  const [searchTerm, setSearchTerm] = useState<string>("")
+  const [filteredForms, setFilteredForms] = useState<IForm[]>([])
+
   const { data: session, update } = useSession()
 
   // Toast Message States
@@ -51,6 +56,7 @@ const ProfilePage = () => {
       const data = await response.json()
       if (response.ok) {
         setForms(data.data)
+        setFilteredForms(data.data)
       } else {
         console.error("Failed to fetch forms:", data.error)
       }
@@ -129,13 +135,16 @@ const ProfilePage = () => {
     setShowPopup(false)
   }
 
-  // Confirm and delete the form
+  // confirm and delete the form
   const handleConfirmDelete = async () => {
     if (selectedForm) {
       try {
         const response = await axios.delete(`/api/forms?id=${selectedForm._id}`)
         if (response.status === 200) {
           setForms((prevForms) =>
+            prevForms.filter((form) => form._id !== selectedForm._id)
+          )
+          setFilteredForms((prevForms) =>
             prevForms.filter((form) => form._id !== selectedForm._id)
           )
           handleCancelDelete()
@@ -156,10 +165,18 @@ const ProfilePage = () => {
     setSelectedForm(null)
   }
 
-  // Function to handle form update confirmation
+  // function to handle form update confirmation
   const handleEditFormConfirm = () => {
     fetchForms() // refetch
     handleCancelEditFormModal()
+  }
+
+  // function to handle search
+  const handleSearch = () => {
+    const filtered = forms.filter((form) =>
+      form.title.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    setFilteredForms(filtered)
   }
 
   if (!session?.user) {
@@ -214,6 +231,21 @@ const ProfilePage = () => {
                   />
                 </Link>
               </div>
+              <div className="flex pb-3">
+                <input
+                  type="text"
+                  className="w-full rounded-lg bg-gray-700 p-4 border-gray-200 text-sm shadow-sm"
+                  placeholder="Search form.."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <button 
+                  className="bg-orange-500 flex p-3 items-center rounded-md ml-2"
+                  onClick={handleSearch}
+                >
+                  <BiSearch className="text-xl" /> Search
+                </button>
+              </div>
               {loading ? (
                 <div className="flex justify-center items-center">
                   <ThreeDots
@@ -223,13 +255,11 @@ const ProfilePage = () => {
                     color="#3b82f6"
                     radius="1"
                     ariaLabel="three-dots-loading"
-                    wrapperStyle={{}}
-                    wrapperClass=""
                   />
                 </div>
-              ) : forms.length > 0 ? (
+              ) : filteredForms.length > 0 ? (
                 <ul className="space-y-4">
-                  {forms.map((form) => (
+                  {filteredForms.map((form) => (
                     <li
                       key={form._id}
                       className="bg-gray-700 p-4 rounded-lg flex justify-between items-center"
