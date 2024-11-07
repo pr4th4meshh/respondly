@@ -1,4 +1,4 @@
-'use client'
+"use client"
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
@@ -6,7 +6,7 @@ import axios from "axios"
 import { useSession } from "next-auth/react"
 import ButtonComponent from "@/components/ButtonComponent"
 import ConfirmModal from "@/components/ConfirmModal"
-import { IoAddCircleOutline } from "react-icons/io5"
+import { IoAddCircleOutline, IoCloseOutline } from "react-icons/io5"
 import EditFormModal from "@/components/EditFormModal"
 import ProfileForm from "./_components/ProfileForm"
 import Popup from "@/components/Popup"
@@ -239,7 +239,15 @@ const ProfilePage = () => {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
-                <button 
+                {searchTerm.length > 0 && (
+                  <span
+                    className="flex p-0 items-center rounded-md ml-2 cursor-pointer"
+                    onClick={() => setSearchTerm("")}
+                  >
+                    <IoCloseOutline className="text-3xl" />
+                  </span>
+                )}
+                <button
                   className="bg-orange-500 flex p-3 items-center rounded-md ml-2"
                   onClick={handleSearch}
                 >
