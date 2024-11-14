@@ -1,7 +1,9 @@
 "use client"
 
 import Loading from "@/components/loading"
+import Popup from "@/components/Popup"
 import { useState, useEffect, FormEvent } from "react"
+import { BiLink } from "react-icons/bi"
 
 interface IField {
   label: string
@@ -28,6 +30,7 @@ const FormPage = ({ params }: { params: { formId: string } }) => {
   const [errorMessage, setErrorMessage] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [showPopup, setShowPopup] = useState(false)
 
   useEffect(() => {
     if (params.formId) {
@@ -104,6 +107,12 @@ const FormPage = ({ params }: { params: { formId: string } }) => {
     }
   }
 
+  const copyShareLink = () => {
+    navigator.clipboard.writeText(window.location.href)
+    setShowPopup(true)
+    // alert("Link copied to clipboard")
+  }
+
   if (loading) {
     return <Loading />
   }
@@ -118,6 +127,12 @@ const FormPage = ({ params }: { params: { formId: string } }) => {
 
   return (
     <div className="min-h-screen bg-gray-900 py-12">
+      <Popup
+        type="success"
+        message="Link copied to clipboard"
+        show={showPopup}
+        onClose={() => setShowPopup(false)}
+      />
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-lg mx-auto bg-gray-800 shadow-lg rounded-lg overflow-hidden">
           <div className="px-6 py-8">
@@ -236,6 +251,12 @@ const FormPage = ({ params }: { params: { formId: string } }) => {
                 {isSubmitting ? "Submitting..." : "Submit Response"}
               </button>
             </form>
+            <button
+              className="text-white w-full bg-yellow-600 mt-2 justify-center text-sm px-4 py-2 rounded-md flex items-center"
+              onClick={copyShareLink}
+            >
+              <BiLink className="text-xl mr-1" /> Share Form
+            </button>
             {successMessage && (
               <p className="mt-4 text-center text-green-400">
                 {successMessage}
